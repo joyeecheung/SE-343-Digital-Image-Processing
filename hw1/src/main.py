@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 import os
 import argparse
+
+from PIL import Image
+
 from scale import scale
 from quantize import quantize
-from PIL import Image
 
 
 def test_scale(filename, result_dir):
@@ -57,7 +59,7 @@ def main():
         raise Exception("Source file doesn't exists!")
     print 'Result directory: ' + result_dir
 
-    #test_scale(filename, result_dir)
+    test_scale(filename, result_dir)
     test_quantize(filename, result_dir)
 
 if __name__ == "__main__":

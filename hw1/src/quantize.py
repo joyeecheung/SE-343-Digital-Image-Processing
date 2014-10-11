@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from util import ImageForProcess, create_image
 from bisect import bisect_right
+
+from util import ImageForProcess, create_image
 
 
 def find_neighbor(values):
