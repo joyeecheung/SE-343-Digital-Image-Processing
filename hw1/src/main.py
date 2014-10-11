@@ -32,7 +32,7 @@ def test_quantize(filename, result_dir):
         result_level = len(result.getcolors())
 
         if result_level != level:
-            raise(
+            raise Exception(
                 "[FAIL] Quantization: expected %d, actual %d"
                 % (level, result_level))
 
@@ -57,7 +57,7 @@ def main():
         raise Exception("Source file doesn't exists!")
     print 'Result directory: ' + result_dir
 
-    test_scale(filename, result_dir)
+    #test_scale(filename, result_dir)
     test_quantize(filename, result_dir)
 
 if __name__ == "__main__":
