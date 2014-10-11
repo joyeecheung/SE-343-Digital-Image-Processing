@@ -24,6 +24,24 @@ def test_scale(filename, result_dir):
             print 'Saved ' + result_path
 
 
+def test_quantize(filename, result_dir):
+    input_img = Image.open(filename)
+    cases = [128, 32, 8, 4, 2]
+    for level in cases:
+        result = quantize(input_img, level)
+        result_level = len(result.getcolors())
+
+        if result_level != level:
+            raise(
+                "[FAIL] Quantization: expected %d, actual %d"
+                % (level, result_level))
+
+        result_name = 'quantize-%d.png' % (level, )
+        result_path = os.path.join(result_dir, result_name)
+        result.save(result_path)
+        print 'Saved ' + result_path
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--source", type=str, default="02.png")
@@ -40,6 +58,7 @@ def main():
     print 'Result directory: ' + result_dir
 
     test_scale(filename, result_dir)
+    test_quantize(filename, result_dir)
 
 if __name__ == "__main__":
     main()
