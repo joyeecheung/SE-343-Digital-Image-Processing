@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from util import ImageForProcess, create_image
-from math import log
 from bisect import bisect_right
 
 
@@ -16,6 +15,7 @@ def find_neighbor(values):
 def quantize(input_img, level):
     step = 256/(level - 1)
     values = [0] + list(range(step, 256 - step, step)) + [255]
+
     im = ImageForProcess(input_img)
     data = im.get_pixels()
     f = find_neighbor(values)

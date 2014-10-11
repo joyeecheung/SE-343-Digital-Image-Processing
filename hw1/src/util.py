@@ -5,10 +5,15 @@ from numpy import arange
 from scipy import interpolate
 
 
-class ImageForProcess():
+class ImageForProcess(object):
     def __init__(self, im):
-        self.im = im
-        self.width, self.height = self.im.size
+        self._im = im
+        self.width, self.height = self._im.size
+
+    def __getattr__(self, key):
+        if key == '_im':
+            raise AttributeError()
+        return getattr(self._im, key)
 
     def get_pixels(self, band=None):
         """Get the pixel data stored in a nested list.
@@ -20,12 +25,12 @@ class ImageForProcess():
         for y in range(self.height):
             row = []
             for x in range(self.width):
-                row.append(self.im.getpixel((x, y)))
+                row.append(self.getpixel((x, y)))
             data.append(row)
         return data
 
         # use the whole data
-        # data = list(im.getdata(band))
+        # data = list(self._im.getdata(band))
         # return [data[i:i+width] for i in range(0, len(data), width)]
 
     def get_interpolation(self, band=None):
@@ -33,7 +38,7 @@ class ImageForProcess():
 
         band default to None i.e. a grey image
         """
-        width, height = self.im.size
+        width, height = self.size
         x, y = arange(self.width), arange(height)
         z = self.get_pixels(band)
         return interpolate.interp2d(x, y, z)
