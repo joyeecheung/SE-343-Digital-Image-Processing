@@ -7,18 +7,26 @@ from util import ImageForProcess, create_image
 
 
 def scale(input_img, size):
+    """Scale image to given size.
+
+    The input must be a grey image.
+    Usage:
+        output_img = scale(input_img, size)
+    """
+
+    # calculate measures of input/output
     in_size = input_img.size
     in_width, in_height = in_size
     out_width, out_height = size
 
-    # horizontal coordinates(relative)
+    # relative horizontal coordinates of output images
     x = arange(0.0, in_width, float(in_width)/out_width)
-    # vertical coordinates(relative)
+    # relative vertical coordinates of output images
     y = arange(0.0, in_height, float(in_height)/out_height)
 
     # get interpolated value
     im = ImageForProcess(input_img)
     ip = im.get_interpolation()
-    data = ip(x, y)
+    pixels = ip(x, y)
 
-    return create_image(input_img.mode, size, lambda x, y: data[y][x])
+    return create_image(input_img.mode, size, lambda x, y: pixels[y][x])

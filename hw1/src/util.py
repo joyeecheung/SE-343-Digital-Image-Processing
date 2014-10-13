@@ -6,10 +6,22 @@ from scipy import interpolate
 
 
 class ImageForProcess(object):
+    """Extension of the PIL `Image` class.
+
+    Since the PIL `Image` class isn't designed to be inherited,
+    it is just a wrapper of the `Image` class.
+
+    Instantiated with:
+        im = ImageForProcess(PIL_Image_instace)
+
+    The original attributes in the `Image` class can be accessed as usual.
+    """
     def __init__(self, im):
         self._im = im
         self.width, self.height = self._im.size
 
+    # Mimic inheritance.
+    # Enable direct access to the attributes of `Image`.
     def __getattr__(self, key):
         if key == '_im':
             raise AttributeError()
@@ -20,7 +32,7 @@ class ImageForProcess(object):
 
         e.g.  [[1,2,3], [3,4,5] ...], each row is a horizontal line.
         """
-        # by pixel
+        # process by pixel because of the limitation in HW1
         data = []
         for y in range(self.height):
             row = []
@@ -49,6 +61,7 @@ def create_image(mode, size, cb):
     out = Image.new(mode, size)
 
     # draw the new image
+    # process by pixel because of the limitation in HW1
     for y in range(size[1]):
         for x in range(size[0]):
             out.putpixel((x, y), cb(x, y))
