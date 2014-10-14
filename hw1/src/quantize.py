@@ -21,7 +21,7 @@ def NeighborFinder(values):
         values)
 
     # binary search in the bounds to find the appropirate interval
-    # notice that the inserted means must have odd indexes
+    # notice that the inserted means must have odd indices
     return lambda x: values[bisect_right(bounds, x)/2]
 
 
@@ -32,10 +32,8 @@ def quantize(input_img, level):
     Usage:
         output_img = quantize(input_img, level)
     """
-    # size of interval
-    step = 256/(level - 1)
     # new color palette
-    palette = [0] + list(range(step, 256 - step, step)) + [255]
+    palette = [0] + [255 * i / (level - 1) for i in range(level)]
 
     im = ImageForProcess(input_img)
     pixels = im.get_pixels()

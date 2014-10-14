@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from PIL import Image
 from numpy import arange
 from scipy import interpolate
@@ -48,7 +49,7 @@ class ImageForProcess(object):
     def get_interpolation(self, band=None):
         """Get the interpolation of specific band.
 
-        band default to None i.e. a grey image
+        `band` default to None i.e. a grey image
         """
         width, height = self.size
         x, y = arange(self.width), arange(height)

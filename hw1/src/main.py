@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import os
 import argparse
 
@@ -55,7 +56,7 @@ def test_scale(filename, result_dir=None):
 def test_quantize(filename, result_dir=None):
     input_img = Image.open(filename)
 
-    cases = [128, 32, 8, 4, 2]
+    cases = [128, 32, 8, 4, 2, 100]
     count = 1
 
     for level in cases:
@@ -97,7 +98,7 @@ def main():
         raise Exception("Source file doesn't exists!")
     print 'Result directory: ' + result_dir
 
-    test_scale(filename, result_dir)
+    #test_scale(filename, result_dir)
     test_quantize(filename, result_dir)
 
 if __name__ == "__main__":
