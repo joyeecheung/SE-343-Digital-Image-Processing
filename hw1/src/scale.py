@@ -27,6 +27,6 @@ def scale(input_img, size):
     # get interpolated value
     im = ImageForProcess(input_img)
     ip = im.get_interpolation()
-    pixels = ip(x, y)
+    pixels = ip(y, x)
 
     return create_image(input_img.mode, size, lambda x, y: pixels[y][x])

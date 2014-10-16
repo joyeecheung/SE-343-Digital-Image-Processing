@@ -4,6 +4,7 @@
 from PIL import Image
 from numpy import arange
 from scipy import interpolate
+import numpy as np
 
 
 class ImageForProcess(object):
@@ -53,8 +54,8 @@ class ImageForProcess(object):
         """
         width, height = self.size
         x, y = arange(self.width), arange(height)
-        z = self.get_pixels(band)
-        return interpolate.interp2d(x, y, z)
+        z = np.array(self.get_pixels(band))
+        return interpolate.RectBivariateSpline(y, x, z)
 
 
 def create_image(mode, size, cb):
