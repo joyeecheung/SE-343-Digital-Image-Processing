@@ -33,12 +33,12 @@ def test_scale(filename, result_dir=None):
 
     for case in cases:
         for size in case:
+            print "Scaling Case %d" % (count, )
             result = scale(input_img, size)
             result_size = result.size
             comparison = "expected size %s, actual size %s" % (
                 str(size), str(result_size))
 
-            print "Scaling Case %d" % (count, )
             count += 1
 
             expect(
@@ -60,12 +60,12 @@ def test_quantize(filename, result_dir=None):
     count = 1
 
     for level in cases:
+        print "Quantization Case %d" % (count, )
         result = quantize(input_img, level)
         result_level = len(result.getcolors())
         comparison = "expected level %d, actual size %d" % (
             level, result_level)
 
-        print "Quantization Case %d" % (count, )
         count += 1
         expect(
             result_level == level,

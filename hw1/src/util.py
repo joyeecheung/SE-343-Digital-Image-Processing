@@ -60,7 +60,6 @@ class ImageForProcess(object):
 def create_image(mode, size, cb):
     # create a new image
     out = Image.new(mode, size)
-
     # draw the new image
     # process by pixel because of the limitation in HW1
     for y in range(size[1]):
