@@ -55,6 +55,8 @@ class ImageForProcess(object):
         width, height = self.size
         x, y = arange(self.width), arange(height)
         z = np.array(self.get_pixels(band))
+        # nearest when kx=ky=0, bilinear when kx=ky=1,
+        # cubic when kx=ky=3(default)
         return interpolate.RectBivariateSpline(y, x, z)
 
 

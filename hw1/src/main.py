@@ -63,7 +63,7 @@ def test_quantize(filename, result_dir=None):
         print "Quantization Case %d" % (count, )
         result = quantize(input_img, level)
         result_level = len(result.getcolors())
-        comparison = "expected level %d, actual size %d" % (
+        comparison = "expected level %d, actual level %d" % (
             level, result_level)
 
         count += 1
