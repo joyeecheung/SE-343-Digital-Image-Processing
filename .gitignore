@@ -6,3 +6,5 @@ prototype*
 *.pyc
 *~
 hw*.pdf
+**/doc/*
+!**/doc/*.tex
