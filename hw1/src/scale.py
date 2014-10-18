@@ -14,6 +14,11 @@ def scale(input_img, size):
         output_img = scale(input_img, size)
     """
 
+    if size == input_img.size:
+        return create_image(
+            input_img.mode, size,
+            lambda x, y: input_img.getpixel((x, y)))
+
     # calculate measures of input/output
     in_size = input_img.size
     in_width, in_height = in_size

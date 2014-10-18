@@ -102,4 +102,192 @@
 \item $(\overline{A} \cap B \cap \overline{C}) \cup (A \cap \overline{B} \cap C)$
 \end{enumerate}
 
+\section{Programming Tasks}
+\subsection{Scaling}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../img/02.png}
+\caption{The original image}
+\label{scaleorigin}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=144pt]{../result/scale-192-128.png}
+\caption{Down-scale to $192 \times 128$}
+\label{scale192}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=72pt]{../result/scale-96-64.png}
+\caption{Down-scale to $96 \times 64$}
+\label{scale96}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=36pt]{../result/scale-48-32.png}
+\caption{Down-scale to $48 \times 32$}
+\label{scale48}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=18pt]{../result/scale-24-16.png}
+\caption{Down-scale to $24 \times 16$}
+\label{scale24}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=9pt]{../result/scale-12-8.png}
+\caption{Down-scale to $12 \times 8$}
+\label{scale12}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=225pt]{../result/scale-300-200.png}
+\caption{Down-scale to $300 \times 200$}
+\label{scale300}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=337.5pt]{../result/scale-450-300.png}
+\caption{Up-scale to $450 \times 300$}
+\label{scale450}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=375pt]{../result/scale-500-200.png}
+\caption{Scale to $500 \times 200$}
+\label{scale500}
+\end{figure}
+
+\begin{algorithm}[h]
+\centering
+\caption{Scaling gray image}
+\label{alg:scale}
+  \begin{algorithmic}[1]
+    \Function{Scale}{$input\_img$, $size$}
+      \State Create an empty image $output\_img$ with $size$
+	  \If{$input\_img.size$ == $size$}
+        \State Copy $input\_img$ to $output\_img$
+        \State \Return $output\_img$
+	  \EndIf
+      \State \textsc{Interpolate} $\gets$ \Call{GetInterpolation}{$input\_img$}
+      \For{each pixel $(x, y)$ in $output\_img$}
+      	\State $(relx, rely) \gets$ \Call{GetRelativePosition}{$x$, $y$, $size$, $input\_img.size$}
+      	\State $new\_value \gets$ \Call{Interpolate}{$relx$, $rely$}
+      	\State Put $new\_value$ back into $(x, y)$ in $output\_img$
+      \EndFor
+      \State \Return $output\_img$
+    \EndFunction
+    \\
+    \Function{GetInterpolation}{$input\_img$}
+      \State $x \gets [0, 1, ..., input\_img.width - 1]$
+      \State $y \gets [0, 1, ..., input\_img.height - 1]$
+      \For{each $j$ in $y$}
+      	\For{each $i$ in $x$}
+      	  \State $row \gets$ an empty list
+      	  \State Append $input\_img.getpixel(i, j)$ to $row$
+      	\EndFor
+      	\State Append $row$ to $z$
+      \EndFor
+      \State \Return \Call{GetBicubicInterpolation}{$x$, $y$, $z$}
+    \EndFunction
+    \\
+    \Function{GetRalativePosition}{$x$, $y$, $new\_size$, $old\_size$}
+      \State $new\_width, new\_height = new\_size$
+      \State $old\_width, old\_height = old\_size$
+      \State $new\_x \gets x \times \frac{old\_width}{new\_width}$ 
+      \State $new\_y \gets y \times \frac{old\_height}{new\_height}$ 
+      \State \Return $new\_x, new\_y$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Quantization}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../img/02.png}
+\caption{The original image}
+\label{quanorigin}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../result/quantize-128.png}
+\caption{128 gray levels}
+\label{quan128}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../result/quantize-32.png}
+\caption{32 gray levels}
+\label{quan32}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../result/quantize-8.png}
+\caption{8 gray levels}
+\label{quan8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../result/quantize-4.png}
+\caption{4 gray levels}
+\label{quan4}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+% pt = px * 72 / DPI
+\includegraphics[width=288pt]{../result/quantize-2.png}
+\caption{2 gray levels}
+\label{quan2}
+\end{figure}
+
+\begin{algorithm}[h]
+\centering
+\caption{Quantize gray image}
+\label{alg:quan}
+  \begin{algorithmic}[1]
+    \Function{Quantize}{$input\_img, level$}
+      \State Create an empty image $output\_img$ with $input\_img.size$
+      \If{$input\_img.level$ == $level$}
+      	\State Copy $input\_img$ to $output\_img$
+      	\State \Return $output\_img$
+      \EndIf
+      \State $new\_pallete \gets [\lfloor255 \times \frac{i}{level-1}\rfloor$ for $i$ in $[0, 1, ..., level]$]
+      \For{each pixel $(x, y)$ in $input_img$}
+      	\State $new\_color \gets$ the nearest neighbor of the pixel color in $new\_pallete$
+      	\State Put $new\_color$ into $(x, y)$ in the $output\_img$
+      \EndFor
+      \State \Return $output\_img$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 \end{document}
