@@ -8,3 +8,4 @@ prototype*
 hw*.pdf
 **/doc/*
 !**/doc/*.tex
+!**/doc/*.bib

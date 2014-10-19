@@ -38,3 +38,8 @@ The results will show up in `result` directory.
     ├─  scale.py
     └─  util.py
 ```
+
+##About
+* [Github repository](https://github.com/joyeec9h3/SE-343-Digital-Image-Processing/tree/master/hw1)
+* Author: Qiuyi Zhang
+* Time: Oct. 2014
