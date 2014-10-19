@@ -15,14 +15,16 @@
 \usepackage{tikz}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{float}
 \usetikzlibrary{arrows,matrix,positioning}
+\setcounter{tocdepth}{3}
 
 \begin{document}
 \title{DIP Homework 1}
 \author{Qiuyi Zhang 12330402 \\ \href{mailto:joyeec9h3@gmail.com}{joyeec9h3@gmail.com}} 
 \date{\today}
 \maketitle
-
+\tableofcontents
 \section{Exercises}
 
 \subsection{Storage}
@@ -105,6 +107,38 @@
 \section{Programming Tasks}
 \subsection{Scaling}
 
+\subsubsection{Discussion}
+\paragraph{}
+There are~\ref{lastscale} common ways to scale a gray image \cite{leptonica}:
+
+\begin{enumerate}
+\item Sampling
+\item Area mapping (or area averaging) and lowpass filtering
+\item Mip-mapping
+\item Min-max
+\item Interpolation \label{lastscale}
+\end{enumerate}
+
+For this project, I used interpolation since it is available in many third-party libraries and can produce a good result.
+
+\paragraph{}
+
+There are~\ref{lastinterpolation} common interpolation methods \cite{gonzalez2008digital}:
+\begin{enumerate}
+\item Nearest-neighbor
+\item Bilinear
+\item Bicubic \label{lastinterpolation}
+\end{enumerate}
+
+I chose bicubic interpolation for this project because it is effcient enough, produces fewer interpolation artifacts, and is applicable for both down-scaling and up-scaling. The result are listed in section~\ref{sec:scaleresult}, and the algorithm is described in section~\ref{sec:scaleresult}. We can see that the false contouring starts to appear in the 32-level image.
+
+\begin{description}
+\item[Note] \hfill \\
+Although I have not implement it, there is a very impressive image scaling algorithm, called \textit{seam carving} \cite{Avidan:2007:SCC:1275808.1276390}, which can scale an image to a new aspect ratio very natually.
+\end{description}
+
+\subsubsection{Results}
+\label{sec:scaleresult}
 \begin{figure}[H]
 \centering
 % pt = px * 72 / DPI
@@ -177,7 +211,9 @@
 \label{scale500}
 \end{figure}
 
-\begin{algorithm}[h]
+\subsubsection{Algorithm}
+\label{sec:scalealgo}
+\begin{algorithm}[H]
 \centering
 \caption{Scaling gray image}
 \label{alg:scale}
@@ -222,6 +258,15 @@
 
 \subsection{Quantization}
 
+\subsubsection{Discussion}
+
+\paragraph{}
+Although color quantization for a color image is complex, it is relatively simple to implement quantization for a gray image. For this project, I first compute the new palette for the given gray level, then replace each pixel with its nearest neighbor in this palette. This algorithm is somewhat similar to the median-cut algorithm applied in one dimension.
+
+The results are listed in section~\ref{sec:quanresult}, and the algorithm is described in section~\ref{sec:quanalgo}.
+
+\subsubsection{Results}
+\label{sec:quanresult}
 \begin{figure}[H]
 \centering
 % pt = px * 72 / DPI
@@ -270,6 +315,8 @@
 \label{quan2}
 \end{figure}
 
+\subsubsection{Algorithm}
+\label{sec:quanalgo}
 \begin{algorithm}[h]
 \centering
 \caption{Quantize gray image}
@@ -290,4 +337,9 @@
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
+
+\bibliography{scale}
+
+\bibliographystyle{acm}
+
 \end{document}
