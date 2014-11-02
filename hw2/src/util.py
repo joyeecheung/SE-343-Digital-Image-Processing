@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from PIL import Image
-from numpy import arange
-from scipy import interpolate
-import numpy as np
 
 
 def create_image(mode, size, cb):

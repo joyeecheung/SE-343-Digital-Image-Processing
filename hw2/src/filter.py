@@ -18,7 +18,8 @@ def filter2d(input_img, filter):
         wt = np.array(filter).flatten()
 
     def cb(x, y):
-        z = np.zeros(n * m)
+        # z = np.zeros(n * m)
+        z = np.full(n * m, pixels[y][x])
         for j in range(y - a, y + a + 1):
             for i in range(x - b, x + b + 1):
                 if i > 0 and i < N and j > 0 and j < M:
