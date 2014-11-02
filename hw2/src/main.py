@@ -10,7 +10,7 @@ from random import randint
 from util import create_image
 from patch import view_as_window
 from hist import plot_hist, equalize_hist
-from filter import smooth_filter
+from filter import smooth_filter, filter2d, laplacian, sobel
 
 
 def test_plot(filename, result_dir):
@@ -64,6 +64,25 @@ def test_smooth_filter(filename, result_dir):
         print '[Saved] ' + result_path
 
 
+def test_laplacian(filename, result_dir):
+    input_img = Image.open(filename)
+    result = filter2d(input_img, laplacian)
+    result_name = 'laplacian.png'
+    result_path = os.path.join(result_dir, result_name)
+    result.save(result_path)
+    print '[Saved] ' + result_path
+
+
+def test_sobel(filename, result_dir):
+    input_img = Image.open(filename)
+    for index, case in enumerate(sobel):
+        result = filter2d(input_img, case)
+        result_name = 'sobel-%d.png' % (index)
+        result_path = os.path.join(result_dir, result_name)
+        result.save(result_path)
+        print '[Saved] ' + result_path
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--source", type=str, default="02.png")
@@ -86,7 +105,9 @@ def main():
     # test_plot(filename, result_dir)
     # test_equalize(filename, result_dir)
     # test_view_as_window(filename, result_dir)
-    test_smooth_filter(filename, result_dir)
+    # test_smooth_filter(filename, result_dir)
+    #test_laplacian(filename, result_dir)
+    test_sobel(filename, result_dir)
 
 if __name__ == "__main__":
     main()

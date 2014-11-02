@@ -19,7 +19,7 @@ class ImagePatches(object):
         startx, starty = key / (self.W-self.w+1), key % (self.W-self.w+1)
         patch = []
         for i in range(startx, startx + self.h):
-                patch.append(self.pixels[i][starty:starty+self.w])
+            patch.append(self.pixels[i][starty:starty+self.w])
         return patch
 
     def __getitem__(self, key):

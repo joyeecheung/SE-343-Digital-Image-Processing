@@ -12,7 +12,10 @@ def filter2d(input_img, filter):
     a, b = m / 2, n / 2
     patches = view_as_window(input_img, (n, m))
     pixels = patches.pixels
-    wt = filter.flatten()
+    if (isinstance(filter, np.ndarray)):
+        wt = filter.flatten()
+    else:
+        wt = np.array(filter).flatten()
 
     def cb(x, y):
         z = np.zeros(n * m)
@@ -29,3 +32,8 @@ def smooth_filter(input_img, size):
     n, m = size
     filter = np.full((m, n), float(1) / (m * n))
     return filter2d(input_img, filter)
+
+
+laplacian = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
+sobel = [np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]),
+         np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])]
