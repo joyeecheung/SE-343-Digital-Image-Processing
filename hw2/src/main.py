@@ -5,21 +5,11 @@ import os
 import argparse
 
 from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
-from itertools import takewhile
-from util import *
+from random import randint
 
-r = [(790, 0), (1023, 1), (850, 2), (656, 3),
-     (329, 4), (245, 5), (122, 6), (81, 7)]
-
-
-def plot_hist(im):
-    fig, ax = plt.subplots()
-    ax.set_xlim((0, 256))
-    data = np.array(im.getdata())
-    ax.hist(data, 256, color='black', edgecolor='none', alpha=0.7)
-    return fig
+from util import create_image
+from patch import view_as_window
+from hist import plot_hist, equalize_hist
 
 
 def test_plot(filename, result_dir):
@@ -27,24 +17,7 @@ def test_plot(filename, result_dir):
     fig = plot_hist(input_img)
     result_path = os.path.join(result_dir, 'hist.png')
     fig.savefig(result_path)
-
-
-def equalize(data, total, level=256):
-    pdf = map(lambda x: (x[1], float(x[0])/total), data)
-    cdf = [sum(map(lambda x: x[1],
-                   takewhile(lambda x: x[0] <= i,
-                             pdf))) for i in range(level)]
-    table = [round((level - 1) * i) for i in cdf]
-    return table
-
-
-def equalize_hist(input_img):
-    colors = input_img.getcolors()
-    pixel_count = input_img.size[0] * input_img.size[1]
-    lookup = equalize(colors, pixel_count)
-    return create_image(input_img.mode,
-                        input_img.size,
-                        lambda x, y: lookup[input_img.getpixel((x, y))])
+    print '[Saved] ' + result_path
 
 
 def test_equalize(filename, result_dir):
@@ -52,9 +25,30 @@ def test_equalize(filename, result_dir):
     output_img = equalize_hist(input_img)
     result_path = os.path.join(result_dir, 'equalize.png')
     output_img.save(result_path)
+    print '[Saved] ' + result_path
+
     fig = plot_hist(output_img)
     plot_path = os.path.join(result_dir, 'hist-equalize.png')
     fig.savefig(plot_path)
+    print '[Saved] ' + plot_path
+
+
+def test_view_as_window(filename, result_dir=None):
+    input_img = Image.open(filename)
+
+    cases = [(96, 64), (50, 50)]
+    for case in cases:
+        windows = view_as_window(input_img, case)
+        for i in range(8):
+            key = randint(0, windows.len - 1)
+            patch = windows[key]
+            result = create_image(input_img.mode,
+                                  case,
+                                  lambda x, y: patch[y][x])
+            result_name = 'patch-%d-%d-%d.png' % (case[0], case[1], key)
+            result_path = os.path.join(result_dir, result_name)
+            result.save(result_path)
+            print '[Saved] ' + result_path
 
 
 def main():
@@ -78,7 +72,7 @@ def main():
 
     test_plot(filename, result_dir)
     test_equalize(filename, result_dir)
-
+    test_view_as_window(filename, result_dir)
 
 if __name__ == "__main__":
     main()
