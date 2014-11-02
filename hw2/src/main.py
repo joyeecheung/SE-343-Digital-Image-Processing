@@ -10,6 +10,7 @@ from random import randint
 from util import create_image
 from patch import view_as_window
 from hist import plot_hist, equalize_hist
+from filter import smooth_filter
 
 
 def test_plot(filename, result_dir):
@@ -33,7 +34,7 @@ def test_equalize(filename, result_dir):
     print '[Saved] ' + plot_path
 
 
-def test_view_as_window(filename, result_dir=None):
+def test_view_as_window(filename, result_dir):
     input_img = Image.open(filename)
 
     cases = [(96, 64), (50, 50)]
@@ -49,6 +50,18 @@ def test_view_as_window(filename, result_dir=None):
             result_path = os.path.join(result_dir, result_name)
             result.save(result_path)
             print '[Saved] ' + result_path
+
+
+def test_smooth_filter(filename, result_dir):
+    input_img = Image.open(filename)
+
+    cases = [(3, 3), (7, 7), (11, 11)]
+    for case in cases:
+        result = smooth_filter(input_img, case)
+        result_name = 'smoth-%d-%d.png' % case
+        result_path = os.path.join(result_dir, result_name)
+        result.save(result_path)
+        print '[Saved] ' + result_path
 
 
 def main():
@@ -71,8 +84,9 @@ def main():
     print 'Result directory: ' + result_dir
 
     # test_plot(filename, result_dir)
-    test_equalize(filename, result_dir)
+    # test_equalize(filename, result_dir)
     # test_view_as_window(filename, result_dir)
+    test_smooth_filter(filename, result_dir)
 
 if __name__ == "__main__":
     main()

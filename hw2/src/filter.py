@@ -12,7 +12,7 @@ def filter2d(input_img, filter):
     a, b = m / 2, n / 2
     patches = view_as_window(input_img, (n, m))
     pixels = patches.pixels
-    wt = sum(filter, [])
+    wt = filter.flatten()
 
     def cb(x, y):
         z = np.zeros(n * m)
@@ -23,3 +23,9 @@ def filter2d(input_img, filter):
         return np.dot(wt, z)
 
     return create_image(input_img.mode, input_img.size, cb)
+
+
+def smooth_filter(input_img, size):
+    n, m = size
+    filter = np.full((m, n), float(1) / (m * n))
+    return filter2d(input_img, filter)
