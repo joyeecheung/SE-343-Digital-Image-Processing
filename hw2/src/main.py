@@ -70,9 +70,9 @@ def main():
         raise Exception("Source file doesn't exists!")
     print 'Result directory: ' + result_dir
 
-    test_plot(filename, result_dir)
+    # test_plot(filename, result_dir)
     test_equalize(filename, result_dir)
-    test_view_as_window(filename, result_dir)
+    # test_view_as_window(filename, result_dir)
 
 if __name__ == "__main__":
     main()
