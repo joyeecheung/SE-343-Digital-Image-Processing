@@ -101,6 +101,8 @@ def main():
     if not os.path.exists(filename):
         raise Exception("Source file doesn't exists!")
     print 'Result directory: ' + result_dir
+    if not os.path.exists(result_dir):
+        raise Exception("Result directory doesn't exists!")
 
     test_plot(filename, result_dir)
     test_equalize(filename, result_dir)
