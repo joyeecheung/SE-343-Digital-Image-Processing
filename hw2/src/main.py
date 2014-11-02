@@ -10,7 +10,7 @@ from random import randint
 from util import create_image
 from patch import view_as_window
 from hist import plot_hist, equalize_hist
-from filter import smooth_filter, filter2d, laplacian, sobel
+from filter import smooth, filter2d, laplacian, sobel
 
 
 def test_plot(filename, result_dir):
@@ -46,19 +46,19 @@ def test_view_as_window(filename, result_dir):
             result = create_image(input_img.mode,
                                   case,
                                   lambda x, y: patch[y][x])
-            result_name = 'patch-%d-%d-%d.png' % (case[0], case[1], key)
+            result_name = 'patch-%d-%d-%d-%d.png' % (case[0], case[1], i, key)
             result_path = os.path.join(result_dir, result_name)
             result.save(result_path)
             print '[Saved] ' + result_path
 
 
-def test_smooth_filter(filename, result_dir):
+def test_smooth(filename, result_dir):
     input_img = Image.open(filename)
 
     cases = [(3, 3), (7, 7), (11, 11)]
     for case in cases:
-        result = smooth_filter(input_img, case)
-        result_name = 'smoth-%d-%d.png' % case
+        result = smooth(input_img, case)
+        result_name = 'smooth-%d-%d.png' % case
         result_path = os.path.join(result_dir, result_name)
         result.save(result_path)
         print '[Saved] ' + result_path
@@ -67,7 +67,7 @@ def test_smooth_filter(filename, result_dir):
 def test_laplacian(filename, result_dir):
     input_img = Image.open(filename)
     result = filter2d(input_img, laplacian)
-    result_name = 'laplacian.png'
+    result_name = 'sharp-laplacian.png'
     result_path = os.path.join(result_dir, result_name)
     result.save(result_path)
     print '[Saved] ' + result_path
@@ -77,7 +77,7 @@ def test_sobel(filename, result_dir):
     input_img = Image.open(filename)
     for index, case in enumerate(sobel):
         result = filter2d(input_img, case)
-        result_name = 'sobel-%d.png' % (index)
+        result_name = 'sharp-sobel-%d.png' % (index)
         result_path = os.path.join(result_dir, result_name)
         result.save(result_path)
         print '[Saved] ' + result_path
@@ -102,11 +102,11 @@ def main():
         raise Exception("Source file doesn't exists!")
     print 'Result directory: ' + result_dir
 
-    # test_plot(filename, result_dir)
-    # test_equalize(filename, result_dir)
-    # test_view_as_window(filename, result_dir)
-    # test_smooth_filter(filename, result_dir)
-    #test_laplacian(filename, result_dir)
+    test_plot(filename, result_dir)
+    test_equalize(filename, result_dir)
+    test_view_as_window(filename, result_dir)
+    test_smooth(filename, result_dir)
+    test_laplacian(filename, result_dir)
     test_sobel(filename, result_dir)
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ def plot_hist(im):
     fig, ax = plt.subplots()
     ax.set_xlim((0, 256))
     data = np.array(im.getdata())
-    ax.hist(data, 256, color='black', edgecolor='none', alpha=0.7)
+    ax.hist(data, 256, color='black', edgecolor='none')
     return fig
 
 

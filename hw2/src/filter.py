@@ -28,7 +28,7 @@ def filter2d(input_img, filter):
     return create_image(input_img.mode, input_img.size, cb)
 
 
-def smooth_filter(input_img, size):
+def smooth(input_img, size):
     n, m = size
     filter = np.full((m, n), float(1) / (m * n))
     return filter2d(input_img, filter)
