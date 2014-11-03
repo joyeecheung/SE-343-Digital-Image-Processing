@@ -38,7 +38,7 @@ Hence $s_k$ is monotonically increasing, therefore $n_{s_k} = n_{r_k}$. The seco
 
 $$v_k =  \frac{(L-1)}{MN}\sum_{s_j=0}^{s_k}n_{s_j}$$
 
-Becase $n_{s_k} = n_{r_k}$, 
+Because $n_{s_k} = n_{r_k}$, 
 
 $$v_k =  \frac{(L-1)}{MN}\sum_{r_j=0}^{r_k}n_{r_j} = s_k$$
 
@@ -89,7 +89,7 @@ The merging of the bars in Fig. 1(c) is caused by the width of the filter matchi
 \paragraph{}
 After histogram equalization, the image covers a wider range of intensity scale, therefore the result has a higher contrast. The snow on the mountain is whiter and the shades has more level after processing.
 
-The equalized histogram clearly has a more uniformed plot, though inevitably there are some extreme values that still stand out after equalization, like the dark regions at the bottom of the image which reults in the high bars in the left of the plot.
+The equalized histogram clearly has a more uniformed plot, though inevitably there are some extreme values that still stand out after equalization, like the dark regions at the bottom of the image which results in the high bars in the left of the plot.
 
 % -------------------- Algorithm ------------------------
 \subsubsection{Algorithm}
@@ -260,47 +260,110 @@ The equalized histogram clearly has a more uniformed plot, though inevitably the
 \caption{Laplacian filter}
 \end{figure}
 
+\begin{description}
+\item[Note] \hfill \\
+To obtain a sharpened image with the result of a laplacian filter, we can combine the original image with the filtered result. Because the laplacian filter used here has a positive center, the sharpened image can be produced by:
+
+$$g(x,y) = f(x, y) + laplacian(x, y)$$
+
+where $g(x, y)$, $f(x, y)$, and $laplacian(x, y)$ are intensity values at the pixels of coordinate $(x, y)$ in the sharpened image, original image, and the laplacian filtered image, respectively.
+\end{description}
+
 \begin{figure}[H]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=288pt]{../result/filter-sobel-0.png}
-	\caption{Image filtered with $3 \times 3$ Sobel filter}
+	\caption{Image filtered with $3 \times 3$ horizontal Sobel filter}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=288pt]{../result/filter-sobel-1.png}
-	\caption{Image filtered with $3 \times 3$ Sobel filter}
+	\caption{Image filtered with $3 \times 3$ vertical Sobel filter}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\begin{minipage}[b]{0.20\linewidth}
+	\begin{minipage}[b]{0.30\linewidth}
 		\[ \begin{bmatrix}
 			-1 & -2 & -1 \\
 			 0 &  0 &  0 \\
 			 1 &  2 &  1
 		\end{bmatrix} \]
-		\end{minipage}
-	\begin{minipage}[b]{0.20\linewidth}
+		\subcaption{$3 \times 3$ horizontal Sobel filter}
+	\end{minipage}
+	\begin{minipage}[b]{0.30\linewidth}
 		\[ \begin{bmatrix}
 			-1 &  0 &  1 \\
 		    -2 &  0 &  2 \\
 			-1 &  0 &  1
 		\end{bmatrix} \]
+		\subcaption{$3 \times 3$ vertical Sobel filter}
 	\end{minipage}
 	\caption{Sobel filters}
 \end{figure}
+
+\begin{description}
+\item[Note] \hfill \\
+The two filtered result contain the vertical and horizontal derivatives of the original image respectively. To obtain the magnitude of gradient from these two partial derivatives, we can calculate the square root of the sum of the squares:
+
+$$M(x,y) = \sqrt{g_{x}(x, y)^2 + g_{y}(x, y)^2}$$
+
+or approximate the value by calculating:
+
+$$M(x,y) \approx |g_{x}(x, y)| + |g_{y}(x, y)|$$
+
+where $M(x, y)$, $g_{x}(x, y)$, and $g_{y}(x, y)$ are intensity values at the pixels of coordinate $(x, y)$ in the gradient image, horizontally filtered image, and the vertically filtered image, respectively.
+
+To obtain a sharpened image with the gradient, we can calculate:
+
+$$g(x,y) = f(x, y) + M(x, y)$$
+
+where $g(x, y)$, $f(x, y)$, and $M(x, y)$ are intensity values at the pixels of coordinate $(x, y)$ in the sharpened image, original image, and the gradient image, respectively.
+
+\end{description}
+
 % ---------------------- Discussion ---------------------------
-\subsubsection{Discussion}
+\subsubsection{Applications of different filters}
+
+\begin{description}
+\item[Averaging filter] \hfill
+\begin{itemize}
+\item Smooth or blur the image.
+\item Reduce noise.
+\item Combined with thresholding function to obtain a gross representation of an image.
+\end{itemize}
+\item[Median filter] \hfill
+\begin{itemize}
+\item Smooth or blur the image.
+\item Reduce noise, especially \textit{salt-and-pepper} noise.
+\end{itemize}
+\item[Max filter] \hfill
+\begin{itemize}
+\item Find the brightest points in an image.
+\end{itemize}
+\item[Min filter] \hfill
+\begin{itemize}
+\item Find the darkest points in an image.
+\end{itemize}
+\item[Laplacian filter] \hfill
+\begin{itemize}
+\item Detect edges, corners, features, blobs in an image.
+\item Estimate motions in images.
+\end{itemize}
+\item[Sobel filter] \hfill
+\begin{itemize}
+\item Detect edges, corners, features, blobs in an image.
+\end{itemize}
+\end{description}
 
 % ---------------------- Algorithm ---------------------------
 \subsubsection{Algorithm}
 
 \begin{description}
 \item[Note] \hfill \\
-The textbook uses zero padding for the example of correlation, but it also mentions that duplicates or mirror values can be used for padding (see sidenotes on P169). Here I use the duplicate of the neighborhood center for padding when dealing with borders because it produces a more natural result.
+The textbook uses zero padding for the example of correlation, but it also mentions that duplicates or mirror values can be used for padding (see side notes on P169). Here I use the duplicate of the neighborhood center for padding when dealing with borders because it produces a more natural result.
 
 \end{description}
 
