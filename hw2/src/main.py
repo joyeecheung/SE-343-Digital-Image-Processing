@@ -37,16 +37,19 @@ def test_equalize(filename, result_dir):
 def test_view_as_window(filename, result_dir):
     input_img = Image.open(filename)
 
-    cases = [(96, 64), (50, 50)]
-    for case in cases:
-        windows = view_as_window(input_img, case)
-        for i in range(8):
-            key = randint(0, windows.len - 1)
+    cases = [((96, 64),
+              (20605, 36769, 52239, 4993, 16885, 16036, 6120, 2692)),
+             ((50, 50),
+              (21668, 11292, 44273, 51172, 53769, 67841, 5296, 53054))]
+    for patch_size, keys in cases:
+        windows = view_as_window(input_img, patch_size)
+        for i, key in enumerate(keys):
             patch = windows[key]
             result = create_image(input_img.mode,
-                                  case,
+                                  patch_size,
                                   lambda x, y: patch[y][x])
-            result_name = 'patch-%d-%d-%d-%d.png' % (case[0], case[1], i, key)
+            result_name = 'patch-%d-%d-%d.png' % (patch_size[0],
+                                                  patch_size[1], i)
             result_path = os.path.join(result_dir, result_name)
             result.save(result_path)
             print '[Saved] ' + result_path
