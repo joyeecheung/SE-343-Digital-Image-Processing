@@ -49,40 +49,44 @@ This shows that a second pass of histogram equalization produces exactly the sam
 \textbf{Answer:}
 The merging of the bars in Fig. 1(c) is caused by the width of the filter matching the width of a bar plus the distance between the bars. When the filter is shifted between the bars, it will always cover exactly the same group of pixels that make up one bar, so the numerator for the averaging operator will always be the same within this area. Because the denominator is a constant for a given averaging filter, it will produce the same response across the area containing the bars, therefore the bars seem to be merged. But in Fig. 1(b) and Fig. 1(d), the width of the filter is smaller/larger than, or not a multiple of, the width of a bar plus the distance between the bars. Therefore there are no merging effects in these two figures.
 
+% -------------------- Programming Tasks ------------------------
 \section{Programming Tasks}
+% -------------------- Histogram Equalization ------------------------
 \subsection{Histogram Equalization}
+% -------------------- Results ------------------------
 \subsubsection{Results}
-
 \begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../img/02.png}
-\caption{The original image}
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../img/02.png}
+	\caption{The original image}
 \end{figure}
 
 \begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=300pt]{../result/hist.png}
-\caption{Histogram of the original image}
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=300pt]{../result/hist.png}
+	\caption{Histogram of the original image}
 \end{figure}
 
 \begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../result/equalize.png}
-\caption{Histogram-equalized result}
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/equalize.png}
+	\caption{Histogram-equalized result}
 \end{figure}
 
 \begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=300pt]{../result/hist-equalize.png}
-\caption{Histogram of the histogram-equalized result}
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=300pt]{../result/hist-equalize.png}
+	\caption{Histogram of the histogram-equalized result}
 \end{figure}
 
+% -------------------- Discussion ------------------------
 \subsubsection{Discussion}
 
+% -------------------- Algorithm ------------------------
 \subsubsection{Algorithm}
 \begin{algorithm}[h]
 \centering
@@ -104,283 +108,193 @@ The merging of the bars in Fig. 1(c) is caused by the width of the filter matchi
   \end{algorithmic}
 \end{algorithm}
 
+% -------------------- Image Patch Extraction ------------------------
 
 \subsection{Image Patch Extraction}
+
+% -------------------- Results ------------------------
 \subsubsection{Results}
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../img/02.png}
+	\caption{The original image}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-0.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-1.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-2.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-3.png}
+	\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-4.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-5.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-6.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=72pt]{../result/patch-96-64-7.png}
+	\end{minipage}
+	\caption{96 $\times$ 64 patches}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-0.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-1.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-2.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-3.png}
+	\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-4.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-5.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-6.png}
+	\end{minipage}
+	\begin{minipage}[b]{0.24\linewidth}
+		\centering
+		\includegraphics[width=37.5pt]{../result/patch-50-50-7.png}
+	\end{minipage}
+	\caption{50 $\times$ 50 patches}
+\end{figure}
+
+% -------------------- Discussion ------------------------
+
 \subsubsection{Discussion}
+
+% -------------------- Algorithm ------------------------
 \subsubsection{Algorithm}
 
+% -------------------- Spatial Filtering ------------------------
 \subsection{Spatial Filtering}
+
+% -------------------- Results ------------------------
 \subsubsection{Results}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../img/02.png}
+	\caption{The original image}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/filter-smooth-3-3.png}
+	\caption{Smoothed image with $3 \times 3$ averaging filter}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/filter-smooth-7-7.png}
+	\caption{Smoothed image with $7 \times 7$ averaging filter}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/filter-smooth-11-11.png}
+	\caption{Smoothed image with $11 \times 11$ averaging filter}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/filter-laplacian.png}
+	\caption{Image filtered with $3 \times 3$ Laplacian filter}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/filter-sobel-0.png}
+	\caption{Image filtered with $3 \times 3$ Sobel filter}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	% pt = px * 72 / DPI
+	\includegraphics[width=288pt]{../result/filter-sobel-1.png}
+	\caption{Image filtered with $3 \times 3$ Sobel filter}
+\end{figure}
+
+% ---------------------- Discussion ---------------------------
 \subsubsection{Discussion}
+
+% ---------------------- Algorithm ---------------------------
 \subsubsection{Algorithm}
-
 \begin{figure}[H]
-\begin{minipage}[b]{0.45\linewidth}
-\centering
-%\begin{bmatrix}
-
-%\end{bmatrix}
-\subcaption{Shortest 8-path}
-\end{minipage}
-\begin{minipage}[b]{0.45\linewidth}
-\centering
-\begin{tikzpicture}
-\matrix [matrix of math nodes,left delimiter={[},right delimiter={]}] (m)
-{
-    3 & [2ex] 4 & [2ex] 1 & [2ex] 2 & [2ex] 0\\[2ex]
-    0 & [2ex] 1 & [2ex] 0 & [2ex] 4 & [2ex] 2(q)\\[2ex]
-    2 & [2ex] 2 & [2ex] 3 & [2ex] 1 & [2ex] 4\\[2ex]
-    2(p) & [2ex] 0 & [2ex] 4 & [2ex] 2 & [2ex] 1\\[2ex]
-    1 & [2ex] 2 & [2ex] 0 & [2ex] 3 & [2ex] 4\\[2ex]
-};
-\path[-stealth] (m-4-1) edge (m-3-1);
-\path[-stealth] (m-3-1) edge (m-3-2);
-\path[-stealth] (m-3-2) edge (m-3-3);
-\path[-stealth] (m-3-3) edge (m-3-4);
-\path[-stealth] (m-3-4) edge (m-2-5);
-\end{tikzpicture}
-\subcaption{Shortest m-path}
-\end{minipage}
-\caption{Shortest paths}
-\label{fig:adjacency}
-\end{figure}
-
-\begin{enumerate}
-\item $A \cap B \cap C$
-\item $(A \cap B) \cup (B \cap C) \cup (A \cap C)$
-\item $(\overline{A} \cap B \cap \overline{C}) \cup (A \cap \overline{B} \cap C)$
-\end{enumerate}
-
-
-\paragraph{}
-\begin{enumerate}
-\item Sampling
-\item Area mapping (or area averaging) and lowpass filtering
-\item Mip-mapping
-\item Min-max
-\item Interpolation \label{lastscale}
-\end{enumerate}
-
-For this project, I used interpolation since it is available in many third-party libraries and can produce a good result.
-
-\paragraph{}
-
-\begin{enumerate}
-\item Nearest-neighbor
-\item Bilinear
-\item Bicubic \label{lastinterpolation}
-\end{enumerate}
-
-I chose bicubic interpolation for this project because it is effcient enough, produces fewer interpolation artifacts, and is applicable for both down-scaling and up-scaling. The result are listed in section~\ref{sec:scaleresult}, and the algorithm is described in section~\ref{sec:scalealgo}. We can see that the false contouring starts to appear in the 32-level image.
-
-\begin{description}
-\item[Note] \hfill \\
-Although I have not implement it, there is a very impressive image scaling algorithm, called \textit{seam carving}
-\end{description}
-
-\subsubsection{Results}
-\label{sec:scaleresult}
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../img/02.png}
-\caption{The original image}
-\label{scaleorigin}
-\end{figure}
-
-
-\iffalse
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=144pt]{../result/scale-192-128.png}
-\caption{Down-scale to $192 \times 128$}
-\label{scale192}
+	\centering
+		\[ \begin{bmatrix}
+			-1 & -1 & -1 \\
+			-1 &  8 & -1 \\
+			-1 & -1 & -1
+		\end{bmatrix} \]
+\caption{Laplacian filter}
 \end{figure}
 
 \begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=72pt]{../result/scale-96-64.png}
-\caption{Down-scale to $96 \times 64$}
-\label{scale96}
+	\centering
+	\begin{minipage}[b]{0.20\linewidth}
+		\[ \begin{bmatrix}
+			-1 & -2 & -1 \\
+			 0 &  0 &  0 \\
+			 1 &  2 &  1
+		\end{bmatrix} \]
+		\end{minipage}
+	\begin{minipage}[b]{0.20\linewidth}
+		\[ \begin{bmatrix}
+			-1 &  0 &  1 \\
+		    -2 &  0 &  2 \\
+			-1 &  0 &  1
+		\end{bmatrix} \]
+	\end{minipage}
+	\caption{Sobel filters}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=36pt]{../result/scale-48-32.png}
-\caption{Down-scale to $48 \times 32$}
-\label{scale48}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=18pt]{../result/scale-24-16.png}
-\caption{Down-scale to $24 \times 16$}
-\label{scale24}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=9pt]{../result/scale-12-8.png}
-\caption{Down-scale to $12 \times 8$}
-\label{scale12}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=225pt]{../result/scale-300-200.png}
-\caption{Down-scale to $300 \times 200$}
-\label{scale300}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=337.5pt]{../result/scale-450-300.png}
-\caption{Up-scale to $450 \times 300$}
-\label{scale450}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=375pt]{../result/scale-500-200.png}
-\caption{Scale to $500 \times 200$}
-\label{scale500}
-\end{figure}
-
-\subsubsection{Algorithm}
-\label{sec:scalealgo}
-\begin{algorithm}[H]
-\centering
-\caption{Scaling gray image}
-\label{alg:scale}
-  \begin{algorithmic}[1]
-    \Function{Scale}{$input\_img$, $size$}
-      \State Create an empty image $output\_img$ with $size$
-	  \If{$input\_img.size$ == $size$}
-        \State Copy $input\_img$ to $output\_img$
-        \State \Return $output\_img$
-	  \EndIf
-      \State \textsc{Interpolate} $\gets$ \Call{GetInterpolation}{$input\_img$}
-      \For{each pixel $(x, y)$ in $output\_img$}
-      	\State $(relx, rely) \gets$ \Call{GetRelativePosition}{$x$, $y$, $size$, $input\_img.size$}
-      	\State $new\_value \gets$ \Call{Interpolate}{$relx$, $rely$}
-      	\State Put $new\_value$ back into $(x, y)$ in $output\_img$
-      \EndFor
-      \State \Return $output\_img$
-    \EndFunction
-    \\
-    \Function{GetInterpolation}{$input\_img$}
-      \State $x \gets [0, 1, ..., input\_img.width - 1]$
-      \State $y \gets [0, 1, ..., input\_img.height - 1]$
-      \For{each $j$ in $y$}
-      	\For{each $i$ in $x$}
-      	  \State $row \gets$ an empty list
-      	  \State Append $input\_img.getpixel(i, j)$ to $row$
-      	\EndFor
-      	\State Append $row$ to $z$
-      \EndFor
-      \State \Return \Call{GetBicubicInterpolation}{$x$, $y$, $z$}
-    \EndFunction
-    \\
-    \Function{GetRalativePosition}{$x$, $y$, $new\_size$, $old\_size$}
-      \State $new\_width, new\_height = new\_size$
-      \State $old\_width, old\_height = old\_size$
-      \State $new\_x \gets x \times \frac{old\_width}{new\_width}$ 
-      \State $new\_y \gets y \times \frac{old\_height}{new\_height}$ 
-      \State \Return $new\_x, new\_y$
-    \EndFunction
-  \end{algorithmic}
-\end{algorithm}
-
-\paragraph{}
-Although color quantization for a color image is complex, it is relatively simple to implement quantization for a gray image. For this project, I first compute the new palette for the given gray level, then replace each pixel with its nearest neighbor in this palette. This algorithm is somewhat similar to the median-cut algorithm applied in one dimension.
-
-The results are listed in section~\ref{sec:quanresult}, and the algorithm is described in section~\ref{sec:quanalgo}.
-
-\subsubsection{Results}
-\label{sec:quanresult}
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../img/02.png}
-\caption{The original image}
-\label{quanorigin}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../result/quantize-128.png}
-\caption{128 gray levels}
-\label{quan128}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../result/quantize-32.png}
-\caption{32 gray levels}
-\label{quan32}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../result/quantize-8.png}
-\caption{8 gray levels}
-\label{quan8}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../result/quantize-4.png}
-\caption{4 gray levels}
-\label{quan4}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-% pt = px * 72 / DPI
-\includegraphics[width=288pt]{../result/quantize-2.png}
-\caption{2 gray levels}
-\label{quan2}
-\end{figure}
-
-\subsubsection{Algorithm}
-\label{sec:quanalgo}
-\begin{algorithm}[h]
-\centering
-\caption{Quantize gray image}
-\label{alg:quan}
-  \begin{algorithmic}[1]
-    \Function{Quantize}{$input\_img, level$}
-      \State Create an empty image $output\_img$ with $input\_img.size$
-      \If{$input\_img.level$ == $level$}
-      	\State Copy $input\_img$ to $output\_img$
-      	\State \Return $output\_img$
-      \EndIf
-      \State $new\_pallete \gets [\lfloor255 \times \frac{i}{level-1}\rfloor$ for $i$ in $[0, 1, ..., level]$]
-      \For{each pixel $(x, y)$ in $input_img$}
-      	\State $new\_color \gets$ the nearest neighbor of the pixel color in $new\_pallete$
-      	\State Put $new\_color$ into $(x, y)$ in the $output\_img$
-      \EndFor
-      \State \Return $output\_img$
-    \EndFunction
-  \end{algorithmic}
-\end{algorithm}
-
-\bibliography{scale}
-\fi
 \bibliographystyle{acm}
 
 \end{document}

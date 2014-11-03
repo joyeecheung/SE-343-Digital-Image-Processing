@@ -1,6 +1,8 @@
 ##Dependencies
 1. pillow
-2. Numpy, Scipy>=0.14.0
+2. Numpy
+3. Scipy >= 0.14.0
+3. matplotlib
 
 ##How to generate the results
 Enter the `src` directory, run `python main.py`. It will use the `02.png` under `img` directory as default to produce the results.
@@ -10,36 +12,48 @@ To use another source image, put the image under `img` directory, then run `pyth
 The results will show up in `result` directory.
 
 ##Directory structure
-```
-.
-├─ README.md
-├─ requirements.txt
-├─ doc
-│   └─ report.pdf
-├─ img (source image)
-│   └─ 02.png
-├─ result (the results)
-│   ├─  quantize-128.png
-│   ├─  quantize-2.png
-│   ├─  quantize-32.png
-│   ├─  quantize-4.png
-│   ├─  quantize-8.png
-│   ├─  scale-12-8.png
-│   ├─  scale-192-128.png
-│   ├─  scale-24-16.png
-│   ├─  scale-300-200.png
-│   ├─  scale-450-300.png
-│   ├─  scale-48-32.png
-│   ├─  scale-500-200.png
-│   └─  scale-96-64.png
-└─src (the python source code)
-    ├─  main.py (entry point)
-    ├─  quantize.py
-    ├─  scale.py
-    └─  util.py
-```
+
+	.
+	├─ README.md
+	├─ requirements.txt
+	├─ doc
+	│   └─ report.pdf
+	├─ img (source image)
+	│   └─ 02.png
+	├─ result (the results)
+	│   ├─  equalize.png
+	│   ├─  filter-laplacian.png
+	│   ├─  filter-smooth-11-11.png
+	│   ├─  filter-smooth-3-3.png
+	│   ├─  filter-smooth-7-7.png
+	│   ├─  filter-sobel-0.png
+	│   ├─  filter-sobel-1.png
+	│   ├─  hist-equalize.png
+	│   ├─  hist.png
+	│   ├─  patch-50-50-0.png
+	│   ├─  patch-50-50-1.png
+	│   ├─  patch-50-50-2.png
+	│   ├─  patch-50-50-3.png
+	│   ├─  patch-50-50-4.png
+	│   ├─  patch-50-50-5.png
+	│   ├─  patch-50-50-6.png
+	│   ├─  patch-50-50-7.png
+	│   ├─  patch-96-64-0.png
+	│   ├─  patch-96-64-1.png
+	│   ├─  patch-96-64-2.png
+	│   ├─  patch-96-64-3.png
+	│   ├─  patch-96-64-4.png
+	│   ├─  patch-96-64-5.png
+	│   ├─  patch-96-64-6.png
+	│   └─  patch-96-64-7.png
+	└─src (the python source code)
+	    ├─  main.py (entry point)
+	    ├─  hist.py
+	    ├─  patch.py
+	    ├─  filter.py
+	    └─  util.py
 
 ##About
-* [Github repository](https://github.com/joyeec9h3/SE-343-Digital-Image-Processing/tree/master/hw1)
+* [Github repository](https://github.com/joyeec9h3/SE-343-Digital-Image-Processing/tree/master/hw2)
 * Author: Qiuyi Zhang
-* Time: Oct. 2014
+* Time: Nov. 2014
