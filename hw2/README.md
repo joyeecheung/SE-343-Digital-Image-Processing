@@ -54,6 +54,6 @@ The results will show up in `result` directory.
 	    └─  util.py
 
 ##About
-* [Github repository](https://github.com/joyeec9h3/SE-343-Digital-Image-Processing/tree/master/hw2)
+* [Github repository](https://github.com/joyeecheung/SE-343-Digital-Image-Processing/tree/master/hw2)
 * Author: Qiuyi Zhang
 * Time: Nov. 2014
