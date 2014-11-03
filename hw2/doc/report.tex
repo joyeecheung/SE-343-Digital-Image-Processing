@@ -82,7 +82,27 @@ The merging of the bars in Fig. 1(c) is caused by the width of the filter matchi
 \end{figure}
 
 \subsubsection{Discussion}
+
 \subsubsection{Algorithm}
+\begin{algorithm}[h]
+\centering
+\caption{Histogram Equalization}
+  \begin{algorithmic}[1]
+    \Function{equalize\_hist}{$input\_img$}
+      \State Create an empty image $output\_img$ with $input\_img.size$
+      \If{$input\_img.level$ == $level$}
+      	\State Copy $input\_img$ to $output\_img$
+      	\State \Return $output\_img$
+      \EndIf
+      \State $new\_pallete \gets [\lfloor255 \times \frac{i}{level-1}\rfloor$ for $i$ in $[0, 1, ..., level]$]
+      \For{each pixel $(x, y)$ in $input_img$}
+      	\State $new\_color \gets$ the nearest neighbor of the pixel color in $new\_pallete$
+      	\State Put $new\_color$ into $(x, y)$ in the $output\_img$
+      \EndFor
+      \State \Return $output\_img$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 
 
 \subsection{Image Patch Extraction}

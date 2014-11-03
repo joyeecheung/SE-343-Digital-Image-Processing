@@ -58,7 +58,7 @@ def test_smooth(filename, result_dir):
     cases = [(3, 3), (7, 7), (11, 11)]
     for case in cases:
         result = smooth(input_img, case)
-        result_name = 'smooth-%d-%d.png' % case
+        result_name = 'filter-smooth-%d-%d.png' % case
         result_path = os.path.join(result_dir, result_name)
         result.save(result_path)
         print '[Saved] ' + result_path
@@ -67,7 +67,7 @@ def test_smooth(filename, result_dir):
 def test_laplacian(filename, result_dir):
     input_img = Image.open(filename)
     result = filter2d(input_img, laplacian)
-    result_name = 'sharp-laplacian.png'
+    result_name = 'filter-laplacian.png'
     result_path = os.path.join(result_dir, result_name)
     result.save(result_path)
     print '[Saved] ' + result_path
@@ -77,7 +77,7 @@ def test_sobel(filename, result_dir):
     input_img = Image.open(filename)
     for index, case in enumerate(sobel):
         result = filter2d(input_img, case)
-        result_name = 'sharp-sobel-%d.png' % (index)
+        result_name = 'filter-sobel-%d.png' % (index)
         result_path = os.path.join(result_dir, result_name)
         result.save(result_path)
         print '[Saved] ' + result_path
