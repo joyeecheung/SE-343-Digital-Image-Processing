@@ -11,35 +11,56 @@ from PIL import Image
 def dftmtx(N):
     """Get discrete fourier transform matrix of size N x N."""
     n = np.asmatrix(np.arange(N))
-    return np.exp((-1j * 2 * pi / N) * n.T * n)
+    return np.exp((-2j * pi / N) * n.T * n)
 
 
 def idftmtx(N):
     """Get inverse discrete fourier transform matrix of size N x N."""
     n = np.asmatrix(np.arange(N))
-    return np.exp((1j * 2 * pi / N) * n.T * n)
+    return np.exp((2j * pi / N) * n.T * n)
+
+
+def fft(x):
+    N = len(x)
+    if (N <= 32):
+        return get_dft(x)
+    else:
+        even = fft(x[0::2])
+        odd = fft(x[1::2])
+        factor = np.exp(-2j * np.pi * np.arange(N) / N)
+        return np.concatenate([even + factor[:N / 2] * odd,
+                              even + factor[N / 2:] * odd])
+
+
+def get_2d(data, fn):
+    """Apply `fn` to each row, then to each column."""
+    M, N = data.shape
+    result = np.array(data) + 0j
+    for i in xrange(M):
+        result[i, :] = fn(result[i, :])
+    for j in xrange(N):
+        result[:, j] = fn(result[:, j])
+    return result
+
+
+def get_fft2d(data):
+    return get_2d(data, fft)
 
 
 def get_dft(data):
     """Get discrete fourier transform of data(numpy matrix/array)."""
     if len(data.shape) == 1:
-        dim = len(data)
-        return dftmtx(dim) * np.reshape(data, (dim, 1))
-    return get_2d(data, lambda data: data * dftmtx(data.shape[1]))
-
-
-def get_2d(data, fn):
-    return fn(fn(data.T).T)
+        return (dftmtx(len(data)) * data[:, None]).A1
+    M, N = data.shape
+    return dftmtx(M) * data * dftmtx(N)
 
 
 def get_idft(data):
     """Get inverse discrete fourier transform of data(numpy matrix/array)."""
     if len(data.shape) == 1:
-        dim = len(data)
-        return (1.0 / dim) * idftmtx(dim) * np.reshape(data, (dim, 1))
+        return ((1.0 / len(data)) * idftmtx(len(data)) * data[:, None]).A1
     M, N = data.shape
-    return (1.0 / (M * N)) * get_2d(data,
-                                    lambda data: data * idftmtx(data.shape[1]))
+    return 1.0 / (M * N) * idftmtx(M) * data * idftmtx(N)
 
 
 def scale_intensity(f, typef, L=256):
@@ -82,8 +103,8 @@ def test():
     assert np.array_equal(scipyShift, myShift)
     print "[PASS] Shift"
 
-    scipyDFT = fftpack.fftshift(fftpack.fft2(lena))  # using fftpack
-    myDFT = shift_dft(get_dft(lena))  # use my code
+    scipyDFT = fftpack.fft2(lena)  # using fftpack
+    myDFT = get_fft2d(lena)  # use my code
     errorF = np.abs(scipyDFT - myDFT)
     rangeF = (np.min(errorF), np.max(errorF))
     assert np.allclose(scipyDFT, myDFT)
@@ -96,7 +117,7 @@ def test():
     assert np.allclose(scipyIDFT, myIDFT)
     print "[PASS] 2D-IDFT, Error in (%.6e, %.6e)" % rangeIF
 
-    data = np.random.rand(1, 1000)
+    data = np.random.rand(1024)
     scipyDFT = fftpack.fft(data)  # using fftpack
     myDFT = get_dft(data)  # use my code
     errorF = np.abs(scipyDFT - myDFT)
