@@ -20,7 +20,7 @@ def idftmtx(N):
 
 
 def fft(x):
-    """Vectorize & iterative FFT."""
+    """Vectorized & iterative FFT."""
     x = np.asarray(x, dtype=complex)
     N = len(x)
     temp = x.reshape((1, N))
@@ -34,11 +34,12 @@ def fft(x):
     return temp.ravel()
 
 
-def pad(data):
+def pad(data, P=None, Q=None):
     next_power_of_two = lambda x: 2 ** int(np.ceil(np.log2(x)))
     M, N = data.shape
-    Q = next_power_of_two(np.max(data.shape))
-    temp = np.zeros((Q, Q))
+    if not P:
+        P, Q = next_power_of_two(M), next_power_of_two(N)
+    temp = np.zeros((P, Q))
     temp[:M, :N] = data
     return temp
 
@@ -77,7 +78,6 @@ def get_idft(data):
         return (idftmtx(len(data)) * data[:, None] / len(data)).A1
     M, N = data.shape
     return np.asarray(idftmtx(M) * data * idftmtx(N) / (M * N))
-    return
 
 
 def scale_intensity(f, typef, L=256):
@@ -103,6 +103,14 @@ def get_power_spectrum(input_img, transform=get_dft):
     fourier = shift_dft(transform(data))
     outdata = scale_intensity(np.log(1 + np.abs(fourier)), np.uint8)
     return Image.fromarray(outdata)
+
+
+def filter(data, kernel):
+    M, N = data.shape
+    fpad = pad(data)
+    kpad = pad(kernel, *fpad.shape)
+    fstar, kstar = get_dft(fpad), get_dft(kpad)
+    return np.abs(get_idft(fstar * kstar))[:M, :N]
 
 
 def show():
