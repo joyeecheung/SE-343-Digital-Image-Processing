@@ -34,6 +34,15 @@ def fft(x):
     return temp.ravel()
 
 
+def pad(data):
+    next_power_of_two = lambda x: 2 ** int(np.ceil(np.log2(x)))
+    M, N = data.shape
+    Q = next_power_of_two(np.max(data.shape))
+    temp = np.zeros((Q, Q))
+    temp[:M, :N] = data
+    return temp
+
+
 def get_2d(data, fn):
     """Apply `fn` to each row, then to each column."""
     result = np.copy(data)
@@ -88,11 +97,11 @@ def shift_dft(f):
     return y
 
 
-def get_power_spectrum(input_img):
+def get_power_spectrum(input_img, transform=get_dft):
     """Get the power spectrum image of a given image."""
     data = np.reshape(input_img.getdata(), input_img.size[::-1])
-    fourier = shift_dft(get_dft(data))
-    outdata = scale_intensity(np.log10(np.abs(fourier) ** 2), np.uint8)
+    fourier = shift_dft(transform(data))
+    outdata = scale_intensity(np.log(1 + np.abs(fourier)), np.uint8)
     return Image.fromarray(outdata)
 
 
@@ -103,12 +112,12 @@ def show():
     psd.show()
 
 
-def test(data, myfunc, libfunc, asse, name):
-    my_result = myfunc(data)
-    lib_result = libfunc(data)
+def test(data, my_func, lib_func, all_right, name):
+    """Check if my implementation is close to the one in the library."""
+    my_result, lib_result = my_func(data), lib_func(data)
     error = np.abs(lib_result - my_result)
     error_range = (np.min(error), np.max(error))
-    if asse(lib_result, my_result):
+    if all_right(lib_result, my_result):
         print "[PASSED] %s, " % name,
         print "Error in (%.6e, %.6e)" % error_range
     else:
@@ -118,6 +127,7 @@ def test(data, myfunc, libfunc, asse, name):
 if __name__ == "__main__":
     lena = np.reshape(misc.lena(), (1024, 256))
     data = np.random.rand(1024)
+
     test(lena, shift_dft, fftpack.fftshift, np.array_equal, 'Shift')
     test(lena, get_dft, fftpack.fft2, np.allclose, '2D-DFT')
     test(lena, get_idft, fftpack.ifft2, np.allclose, '2D-IDFT')
