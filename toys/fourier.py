@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from cmath import exp, pi, sqrt
 import pylab as py
 from scipy import fftpack, misc
 from PIL import Image
@@ -11,13 +10,13 @@ from PIL import Image
 def dftmtx(N):
     """Get discrete fourier transform matrix of size N x N."""
     n = np.asmatrix(np.arange(N))
-    return np.exp((-2j * pi / N) * n.T * n)
+    return np.exp((-2j * np.pi / N) * n.T * n)
 
 
 def idftmtx(N):
     """Get inverse discrete fourier transform matrix of size N x N."""
     n = np.asmatrix(np.arange(N))
-    return np.exp((2j * pi / N) * n.T * n)
+    return np.exp((2j * np.pi / N) * n.T * n)
 
 
 def fft(x):
@@ -43,8 +42,16 @@ def get_2d(data, fn):
     return result.T
 
 
-def get_fft2d(data):
+def get_fft(data):
+    if len(data.shape) == 1:
+        return fft(data)
     return get_2d(data, fft)
+
+
+def get_ifft(data):
+    Fstar = np.conj(data)
+    fstar = get_fft(Fstar) / reduce(np.multiply, data.shape, 1.0)
+    return np.conj(fstar)
 
 
 def get_dft(data):
@@ -58,9 +65,10 @@ def get_dft(data):
 def get_idft(data):
     """Get inverse discrete fourier transform of data(numpy matrix/array)."""
     if len(data.shape) == 1:
-        return ((1.0 / len(data)) * idftmtx(len(data)) * data[:, None]).A1
+        return (idftmtx(len(data)) * data[:, None] / len(data)).A1
     M, N = data.shape
-    return np.asarray(1.0 / (M * N) * idftmtx(M) * data * idftmtx(N))
+    return np.asarray(idftmtx(M) * data * idftmtx(N) / (M * N))
+    return
 
 
 def scale_intensity(f, typef, L=256):
@@ -95,72 +103,28 @@ def show():
     psd.show()
 
 
-def test():
-    """Make sure my implementation is not too far from the scipy one."""
-    lena = np.reshape(misc.lena(), (1024, 256))
-    scipyShift = fftpack.fftshift(lena)
-    myShift = shift_dft(lena)
-    if np.array_equal(scipyShift, myShift):
-        print "[PASS] Shift"
+def test(data, myfunc, libfunc, asse, name):
+    my_result = myfunc(data)
+    lib_result = libfunc(data)
+    error = np.abs(lib_result - my_result)
+    error_range = (np.min(error), np.max(error))
+    if asse(lib_result, my_result):
+        print "[PASSED] %s, " % name,
+        print "Error in (%.6e, %.6e)" % error_range
     else:
-        print "[FALI] Shift"
-
-    scipyDFT = fftpack.fft2(lena)  # using fftpack
-    myDFT = get_dft(lena)  # use my code
-    errorF = np.abs(scipyDFT - myDFT)
-    rangeF = (np.min(errorF), np.max(errorF))
-    if np.allclose(scipyDFT, myDFT):
-        print "[PASS] 2D-DFT, Error in (%.6e, %.6e)" % rangeF
-    else:
-        print "[FAIL] 2D-DFT"
-
-    scipyIDFT = fftpack.ifft2(lena)
-    myIDFT = get_idft(lena)
-    errorIF = np.abs(scipyIDFT - myIDFT)
-    rangeIF = (np.min(errorIF), np.max(errorIF))
-    if np.allclose(scipyIDFT, myIDFT):
-        print "[PASS] 2D-IDFT, Error in (%.6e, %.6e)" % rangeIF
-    else:
-        print "[FAIL] 2D-IDFT"
-
-    data = np.random.rand(1024)
-    scipyDFT = fftpack.fft(data)  # using fftpack
-    myDFT = get_dft(data)  # use my code
-    errorF = np.abs(scipyDFT - myDFT)
-    rangeF = (np.min(errorF), np.max(errorF))
-    if np.allclose(scipyDFT, myDFT):
-        print "[PASS] 1D-DFT, Error in (%.6e, %.6e)" % rangeF
-    else:
-        print "[FAIL] 1D-DFT"
-
-    scipyIDFT = fftpack.ifft(data)
-    myIDFT = get_idft(data)
-    errorIF = np.abs(scipyIDFT - myIDFT)
-    rangeIF = (np.min(errorIF), np.max(errorIF))
-    if np.allclose(scipyIDFT, myIDFT):
-        print "[PASS] 1D-IDFT, Error in (%.6e, %.6e)" % rangeIF
-    else:
-        print "[FAIL] 1D-IDFT"
-
-    scipyDFT = fftpack.fft2(lena)  # using fftpack
-    myDFT = get_fft2d(lena)  # use my code
-    errorF = np.abs(scipyDFT - myDFT)
-    rangeF = (np.min(errorF), np.max(errorF))
-    if np.allclose(scipyDFT, myDFT):
-        print "[PASS] 2D-FFT, Error in (%.6e, %.6e)" % rangeF
-    else:
-        print "[FAIL] 2D-FFT"
-
-    scipyDFT = fftpack.fft(data)  # using fftpack
-    myDFT = fft(data)  # use my code
-    errorF = np.abs(scipyDFT - myDFT)
-    rangeF = (np.min(errorF), np.max(errorF))
-    if np.allclose(scipyDFT, myDFT):
-        print "[PASS] 1D-FFT, Error in (%.6e, %.6e)" % rangeF
-    else:
-        print "[FAIL] 1D-FFT"
+        print "[FAILED] %s" % name
 
 
 if __name__ == "__main__":
-    test()
-    # myDFT = get_fft2d(lena)  # use my code
+    lena = np.reshape(misc.lena(), (1024, 256))
+    data = np.random.rand(1024)
+    test(lena, shift_dft, fftpack.fftshift, np.array_equal, 'Shift')
+    test(lena, get_dft, fftpack.fft2, np.allclose, '2D-DFT')
+    test(lena, get_idft, fftpack.ifft2, np.allclose, '2D-IDFT')
+    test(lena, get_fft, fftpack.fft2, np.allclose, '2D-FFT')
+    test(lena, get_ifft, fftpack.ifft2, np.allclose, '2D-IFFT')
+
+    test(data, get_dft, fftpack.fft, np.allclose, '1D-DFT')
+    test(data, get_idft, fftpack.ifft, np.allclose, '1D-IDFT')
+    test(data, get_fft, fftpack.fft, np.allclose, '1D-FFT')
+    test(data, get_ifft, fftpack.ifft, np.allclose, '1D-IFFT')
