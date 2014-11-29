@@ -34,11 +34,14 @@ def fft(x):
     return temp.ravel()
 
 
+def pow2_ceil(x):
+    return 2 ** int(np.ceil(np.log2(x)))
+
+
 def pad(data, P=None, Q=None):
-    next_power_of_two = lambda x: 2 ** int(np.ceil(np.log2(x)))
     M, N = data.shape
     if not P:
-        P, Q = next_power_of_two(M), next_power_of_two(N)
+        P, Q = pow2_ceil(M), pow2_ceil(N)
     temp = np.zeros((P, Q))
     temp[:M, :N] = data
     return temp
@@ -101,16 +104,57 @@ def get_power_spectrum(input_img, transform=get_dft):
     """Get the power spectrum image of a given image."""
     data = np.reshape(input_img.getdata(), input_img.size[::-1])
     fourier = shift_dft(transform(data))
-    outdata = scale_intensity(np.log(1 + np.abs(fourier)), np.uint8)
+    outdata = scale_intensity(np.log(1 + np.abs(fourier) ** 2), np.uint8)
     return Image.fromarray(outdata)
 
 
 def filter(data, kernel):
     M, N = data.shape
-    fpad = pad(data)
-    kpad = pad(kernel, *fpad.shape)
-    fstar, kstar = get_dft(fpad), get_dft(kpad)
-    return np.abs(get_idft(fstar * kstar))[:M, :N]
+    P, Q = pow2_ceil(2 * M), pow2_ceil(2 * N)
+    m, n = kernel.shape
+
+    X, Y = np.meshgrid(np.arange(Q), np.arange(P))
+    sign = np.power(-1, X + Y)
+
+    fpad = np.zeros((P, Q))
+    fpad[:M, :N] = data
+    fpad = sign * fpad
+
+    kpad = np.zeros((P, Q))
+    kpad[:m, :n] = kernel
+
+    fstar = get_dft(fpad)
+    kstar = np.abs(shift_dft(get_dft(kpad)))
+    return (get_idft(fstar * kstar).real * sign)[:M, :N]
+
+
+def filter2(data, kernel):
+    M, N = data.shape
+    m, n = kernel.shape
+    P, Q = s = (pow2_ceil(m + M - 1), pow2_ceil(n + N - 1))
+
+    fpad = pad(data,  P, Q)
+    kpad = pad(np.flipud(np.fliplr(kernel)), P, Q)
+
+    fpad[M:M + (m - 1) // 2, :N] = data[M - 1, :]
+    fpad[:M, N:N + (n - 1) // 2] = data[:, N - 1].reshape((M, 1))
+
+    xoff = m - (m - 1) // 2 - 1
+    yoff = n - (n - 1) // 2 - 1
+    fpad[P - xoff:, :N] = data[0, :]
+    fpad[:M, Q - yoff:] = data[:, 0].reshape((M, 1))
+
+    fpad[M:M + (m - 1) // 2, N:N + (n - 1) // 2] = data[-1, -1]
+    fpad[P - xoff:, N:N + (n - 1) // 2] = data[0, -1]
+    fpad[M:M + (m - 1) // 2, Q - yoff:] = data[-1, 0]
+    fpad[P - xoff:, Q - yoff:] = data[0, 0]
+
+    result = get_idft(get_dft(fpad) * get_dft(kpad))
+
+    off = ((m - 1) // 2, (n - 1) // 2)
+    result = result[off[0]:off[0] + M, off[1]:off[1] + N]
+
+    return result.real
 
 
 def show():
