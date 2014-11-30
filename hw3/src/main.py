@@ -12,17 +12,14 @@ from filter import *
 
 
 def main():
+    # ---------------- get the command line arguments --------------
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--source", type=str, default="02.png")
     source = parser.parse_args().source
 
-    # absolute path to the directory of this .py
     file_dir = os.path.dirname(os.path.realpath(__file__))
-    # absolute path to the parent directory of this .py
     parent_dir, _ = os.path.split(file_dir)
-    # absolute path to the image file to process
     filename = os.path.join(parent_dir, 'img', source)
-    # absolute path to the result directory
     result_dir = os.path.join(parent_dir, 'result')
 
     print 'Source path: ' + filename
@@ -32,10 +29,12 @@ def main():
     if not os.path.exists(result_dir):
         raise Exception("Result directory doesn't exists!")
 
+    # ------------------- generate results ----------------------
     input_img = Image.open(filename)
     data = np.reshape(input_img.getdata(), input_img.size[::-1])
     M, N = data.shape
 
+    # --------------------- DFT and IDFT ----------------
     dft_shifted = shift_dft(dft2d(data, 1))
     dft_spec = scale_intensity(np.log(1 + np.abs(dft_shifted)))
     dft_spec_path = os.path.join(result_dir, 'dft-spectrum.png')
@@ -47,6 +46,7 @@ def main():
     Image.fromarray(dft_double).convert('L').save(dft_double_path)
     print '[Saved] ' + dft_double_path
 
+    # --------------------- FFT and IFFT ----------------
     fft_shifted = shift_dft(fft2d(pad(data), 1))
     fft_spec = scale_intensity(np.log(1 + np.abs(fft_shifted)))
     fft_spec_path = os.path.join(result_dir, 'fft-spectrum.png')
@@ -58,13 +58,14 @@ def main():
     Image.fromarray(fft_double).convert('L').save(fft_double_path)
     print '[Saved] ' + fft_double_path
 
+    # --------------------- Frequency filters ----------------
     filt_avg = filter2d_freq(input_img, average)
     filt_avg_path = os.path.join(result_dir, 'average-11-11.png')
     filt_avg.save(filt_avg_path)
     print '[Saved] ' + filt_avg_path
 
     filt_lap = filter2d_freq(input_img, laplacian)
-    filt_lap_path = os.path.join(result_dir, 'laplacian-11-11.png')
+    filt_lap_path = os.path.join(result_dir, 'laplacian.png')
     filt_lap.save(filt_lap_path)
     print '[Saved] ' + filt_lap_path
 

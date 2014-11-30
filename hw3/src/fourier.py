@@ -19,6 +19,7 @@ def idftmtx(N):
 
 
 def pow2_ceil(x):
+    """Get the nearest power of 2 ceiling."""
     return 2 ** int(np.ceil(np.log2(x)))
 
 
@@ -46,6 +47,8 @@ def get_2d(data, fn):
 
 
 def pad(data, P=None, Q=None):
+    """Pad the data to given size. If the size is not defined,
+       pad each direction to the nearest power of 2(ceiling)."""
     M, N = data.shape
     if not P:
         P, Q = pow2_ceil(M), pow2_ceil(N)
@@ -55,12 +58,14 @@ def pad(data, P=None, Q=None):
 
 
 def get_fft(data):
+    """1D or 2D fft."""
     if len(data.shape) == 1:
         return fft(data)
     return get_2d(data, fft)
 
 
 def get_ifft(data):
+    """1D or 2D ifft."""
     Fstar = np.conj(data)
     fstar = get_fft(Fstar) / reduce(np.multiply, data.shape, 1.0)
     return np.conj(fstar)
@@ -91,7 +96,7 @@ def scale_intensity(f, typef=np.uint8, L=256):
 
 def shift_dft(f):
     """Shift the fourier transform so that F(0,0) is in the center."""
-    y = np.asarray(f)  # copy
+    y = np.array(f)  # copy
     for k, n in enumerate(f.shape):
         mid = (n + 1) / 2
         indices = np.concatenate((np.arange(mid, n), np.arange(mid)))
@@ -113,15 +118,7 @@ def fft2d(input_img, flags):
         return get_ifft(input_img)
 
 
-def get_spectrum(input_img, transform=get_dft):
-    """Get the power spectrum image of a given image."""
-    data = np.reshape(input_img.getdata(), input_img.size[::-1])
-    fourier = shift_dft(transform(data))
-    outdata = scale_intensity(np.log(1 + np.abs(fourier)))
-    return Image.fromarray(outdata).convert('L')
-
-
-def test(data, my_func, lib_func, all_right, name):
+def test_my_func(data, my_func, lib_func, all_right, name):
     """Check if my implementation is close to the one in the library."""
     my_result, lib_result = my_func(data), lib_func(data)
     error = np.abs(lib_result - my_result)
@@ -137,13 +134,13 @@ if __name__ == "__main__":
     lena = np.reshape(misc.lena(), (1024, 256))
     data = np.random.rand(1024)
 
-    test(lena, shift_dft, fftpack.fftshift, np.array_equal, 'Shift')
-    test(lena, get_dft, fftpack.fft2, np.allclose, '2D-DFT')
-    test(lena, get_idft, fftpack.ifft2, np.allclose, '2D-IDFT')
-    test(lena, get_fft, fftpack.fft2, np.allclose, '2D-FFT')
-    test(lena, get_ifft, fftpack.ifft2, np.allclose, '2D-IFFT')
+    test_my_func(lena, shift_dft, fftpack.fftshift, np.array_equal, 'Shift')
+    test_my_func(lena, get_dft, fftpack.fft2, np.allclose, '2D-DFT')
+    test_my_func(lena, get_idft, fftpack.ifft2, np.allclose, '2D-IDFT')
+    test_my_func(lena, get_fft, fftpack.fft2, np.allclose, '2D-FFT')
+    test_my_func(lena, get_ifft, fftpack.ifft2, np.allclose, '2D-IFFT')
 
-    test(data, get_dft, fftpack.fft, np.allclose, '1D-DFT')
-    test(data, get_idft, fftpack.ifft, np.allclose, '1D-IDFT')
-    test(data, get_fft, fftpack.fft, np.allclose, '1D-FFT')
-    test(data, get_ifft, fftpack.ifft, np.allclose, '1D-IFFT')
+    test_my_func(data, get_dft, fftpack.fft, np.allclose, '1D-DFT')
+    test_my_func(data, get_idft, fftpack.ifft, np.allclose, '1D-IDFT')
+    test_my_func(data, get_fft, fftpack.fft, np.allclose, '1D-FFT')
+    test_my_func(data, get_ifft, fftpack.ifft, np.allclose, '1D-IFFT')
