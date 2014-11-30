@@ -83,7 +83,7 @@ def get_idft(data):
     return np.asarray(idftmtx(M) * data * idftmtx(N) / (M * N))
 
 
-def scale_intensity(f, typef, L=256):
+def scale_intensity(f, typef=np.uint8, L=256):
     """Scale the intensities in the matrix to [0, L-1]."""
     fm = f - np.min(f)
     fs = (L - 1) * (fm / np.max(fm))
@@ -98,14 +98,6 @@ def shift_dft(f):
         indices = np.concatenate((np.arange(mid, n), np.arange(mid)))
         y = np.take(y, indices, k)  # rearrange each axes
     return y
-
-
-def get_power_spectrum(input_img, transform=get_dft):
-    """Get the power spectrum image of a given image."""
-    data = np.reshape(input_img.getdata(), input_img.size[::-1])
-    fourier = shift_dft(transform(data))
-    outdata = scale_intensity(np.log(1 + np.abs(fourier) ** 2), np.uint8)
-    return Image.fromarray(outdata)
 
 
 def filter(data, kernel):
@@ -128,33 +120,27 @@ def filter(data, kernel):
     return (get_idft(fstar * kstar).real * sign)[:M, :N]
 
 
-def filter2(data, kernel):
-    M, N = data.shape
+def pad_then_crop(data, kernel, f):
     m, n = kernel.shape
-    P, Q = s = (pow2_ceil(m + M - 1), pow2_ceil(n + N - 1))
+    M, N = data.shape
+    padded = np.lib.pad(data, (m, n), 'edge')
+    return f(padded, kernel)[m:m+M, n:n+N]
 
-    fpad = pad(data,  P, Q)
-    kpad = pad(np.flipud(np.fliplr(kernel)), P, Q)
 
-    fpad[M:M + (m - 1) // 2, :N] = data[M - 1, :]
-    fpad[:M, N:N + (n - 1) // 2] = data[:, N - 1].reshape((M, 1))
+def get_power_spectrum(input_img, transform=get_dft):
+    """Get the power spectrum image of a given image."""
+    data = np.reshape(input_img.getdata(), input_img.size[::-1])
+    fourier = shift_dft(transform(data))
+    outdata = scale_intensity(np.log(1 + np.abs(fourier)**2))
+    return Image.fromarray(outdata)
 
-    xoff = m - (m - 1) // 2 - 1
-    yoff = n - (n - 1) // 2 - 1
-    fpad[P - xoff:, :N] = data[0, :]
-    fpad[:M, Q - yoff:] = data[:, 0].reshape((M, 1))
 
-    fpad[M:M + (m - 1) // 2, N:N + (n - 1) // 2] = data[-1, -1]
-    fpad[P - xoff:, N:N + (n - 1) // 2] = data[0, -1]
-    fpad[M:M + (m - 1) // 2, Q - yoff:] = data[-1, 0]
-    fpad[P - xoff:, Q - yoff:] = data[0, 0]
-
-    result = get_idft(get_dft(fpad) * get_dft(kpad))
-
-    off = ((m - 1) // 2, (n - 1) // 2)
-    result = result[off[0]:off[0] + M, off[1]:off[1] + N]
-
-    return result.real
+def get_spectrum(input_img, transform=get_dft):
+    """Get the power spectrum image of a given image."""
+    data = np.reshape(input_img.getdata(), input_img.size[::-1])
+    fourier = shift_dft(transform(data))
+    outdata = scale_intensity(np.log(1 + np.abs(fourier)))
+    return Image.fromarray(outdata)
 
 
 def show():
