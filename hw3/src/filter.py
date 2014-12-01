@@ -19,19 +19,15 @@ def apply_filter(data, kernel):
     P, Q = pow2_ceil(M), pow2_ceil(N)
     m, n = kernel.shape
 
-    X, Y = np.meshgrid(np.arange(Q), np.arange(P))
-    sign = np.power(-1, X + Y)
-
     fpad = np.zeros((P, Q))
     fpad[:M, :N] = data
-    fpad = sign * fpad
 
     kpad = np.zeros((P, Q))
     kpad[:m, :n] = kernel
 
     fstar = get_dft(fpad)
-    kstar = np.abs(shift_dft(get_dft(kpad)))
-    return (get_idft(fstar * kstar).real * sign)[:M, :N]
+    kstar = np.abs(get_dft(kpad))
+    return (get_idft(fstar * kstar).real)[:M, :N]
 
 
 def pad_then_crop(data, kernel):
