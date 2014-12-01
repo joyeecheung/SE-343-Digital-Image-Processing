@@ -51,11 +51,11 @@ def main():
     save_result(dft_double, 'dft-double.png')
 
     # --------------------- FFT and IFFT ----------------
-    fft_shifted = shift_dft(fft2d(pad(data), 1))
+    fft_shifted = shift_dft(fft2d(pad_to_pow2(data), 1))
     fft_spec = scale_intensity(np.log(1 + np.abs(fft_shifted)))
     save_result(fft_spec, 'fft-spectrum.png')
 
-    fft_double = fft2d(fft2d(pad(data), 1), -1).real[:M, :N]
+    fft_double = fft2d(fft2d(pad_to_pow2(data), 1), -1).real[:M, :N]
     save_result(fft_double, 'fft-double.png')
 
     # --------------------- Frequency filters ----------------

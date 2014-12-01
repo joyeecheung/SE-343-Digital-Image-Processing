@@ -61,8 +61,8 @@ def recursive_fft(x):
     if (N <= 32):
         return get_dft(x)
     else:
-        even = fft(x[0::2])
-        odd = fft(x[1::2])
+        even = recursive_fft(x[0::2])
+        odd = recursive_fft(x[1::2])
         coff = np.exp(-2j * np.pi * np.arange(N) / N)
         return np.concatenate([even + coff[:N / 2] * odd,
                                even + coff[N / 2:] * odd])
@@ -74,17 +74,6 @@ def get_2d(data, fn):
     result = np.array([fn(row) for row in result])
     result = np.array([fn(col) for col in result.T])
     return result.T
-
-
-def pad(data, P=None, Q=None):
-    """Pad the data to given size. If the size is not defined,
-       pad each direction to the nearest power of 2(ceiling)."""
-    M, N = data.shape
-    if not P:
-        P, Q = pow2_ceil(M), pow2_ceil(N)
-    padded = np.zeros((P, Q))
-    padded[:M, :N] = data
-    return padded
 
 
 def get_fft(data):
@@ -146,6 +135,15 @@ def fft2d(input_img, flags):
         return get_fft(input_img)
     else:
         return get_ifft(input_img)
+
+
+def pad_to_pow2(data):
+    """Pad each direction to the nearest power of 2(ceiling)."""
+    M, N = data.shape
+    P, Q = pow2_ceil(M), pow2_ceil(N)
+    padded = np.zeros((P, Q))
+    padded[:M, :N] = data
+    return padded
 
 
 def test_my_func(data, my_func, lib_func, all_right, name):

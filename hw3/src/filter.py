@@ -3,6 +3,7 @@
 
 import numpy as np
 from fourier import *
+import scipy
 
 # P183 fig 3.37(d)
 laplacian = np.array([[-1, -1, -1],
@@ -16,18 +17,22 @@ average = np.full((11, 11), 1.0 / (11 * 11))
 def apply_filter(data, kernel):
     """Apply the filter(kernel) to the data directly."""
     M, N = data.shape
-    P, Q = pow2_ceil(M), pow2_ceil(N)
     m, n = kernel.shape
+    P, Q = pow2_ceil(m + M - 1), pow2_ceil(m + N - 1)
 
-    fpad = np.zeros((P, Q))
-    fpad[:M, :N] = data
+    X, Y = np.meshgrid(np.arange(Q), np.arange(P))
+    sign = np.power(-1, X + Y)
 
-    kpad = np.zeros((P, Q))
-    kpad[:m, :n] = kernel
+    fp = np.zeros((P, Q))
+    fp[:M, :N] = data
 
-    fstar = get_dft(fpad)
-    kstar = np.abs(get_dft(kpad))
-    return (get_idft(fstar * kstar).real)[:M, :N]
+    hp = np.zeros((P, Q))
+    hp[:m, :n] = kernel
+
+    Fuv = get_dft(fp)
+    Huv = get_dft(hp)
+
+    return (get_idft(Fuv * Huv).real)[m / 2:M + m / 2, n / 2:N + n / 2]
 
 
 def pad_then_crop(data, kernel):
