@@ -24,18 +24,48 @@ def pow2_ceil(x):
 
 
 def fft(x):
-    """Vectorized & iterative FFT."""
+    """Vectorized & iterative FFT.
+       Note: The input needs to be real."""
     x = np.asarray(x, dtype=complex)
     N = len(x)
-    temp = x.reshape((1, N))
 
-    while temp.shape[0] < N:
-        m, n = temp.shape
-        odd, even = temp[:, n / 2:], temp[:, :n / 2]
+    # cutoff
+    Nmin = min(N, 32)
+    subprob = np.asarray(dftmtx(Nmin) * x.reshape((Nmin, -1)))
+
+    # builds up the fft, from (1, N) to (N, 1)
+    while subprob.shape[0] < N:
+        m, n = subprob.shape
+        # concatenate all `odd` part in sub problems
+        # it will turn out to be subprob[:, n / 2:].
+        # e.g. f([1,3,5,7]) -> f([1,5]) + f([3,7])
+        #                   -> f(f([1]) + f([5])) + f(f([3]) + f([7]))
+        #      f([2,4,6,8]) -> f([2,6]) + f([4,8])
+        #                   -> f(f([2]) + f([6])) + f(f([4]) + f([8]))
+        #      so odd parts are [5], [6], [7], [8]
+        #        even parts are [1], [2], [3], [4]
+        odd, even = subprob[:, n / 2:], subprob[:, :n / 2]
+        # since the input is real, the coefficients are symmetric
+        # so we can use each coff to multiply across the same row of `odd`
+        # because the concatenation, m = 2N(N as in subproblem)
+        # so -2j -> -1j
         coff = np.exp(-1j * np.pi * np.arange(m) / m)[:, None]
-        temp = np.vstack((even + coff * odd, even - coff * odd))
+        subprob = np.vstack((even + coff * odd, even - coff * odd))
 
-    return temp.ravel()
+    return subprob.ravel()
+
+
+def recursive_fft(x):
+    """Recursive FFT."""
+    N = len(x)
+    if (N <= 32):
+        return get_dft(x)
+    else:
+        even = fft(x[0::2])
+        odd = fft(x[1::2])
+        coff = np.exp(-2j * np.pi * np.arange(N) / N)
+        return np.concatenate([even + coff[:N / 2] * odd,
+                               even + coff[N / 2:] * odd])
 
 
 def get_2d(data, fn):
@@ -52,9 +82,9 @@ def pad(data, P=None, Q=None):
     M, N = data.shape
     if not P:
         P, Q = pow2_ceil(M), pow2_ceil(N)
-    temp = np.zeros((P, Q))
-    temp[:M, :N] = data
-    return temp
+    padded = np.zeros((P, Q))
+    padded[:M, :N] = data
+    return padded
 
 
 def get_fft(data):
