@@ -18,23 +18,35 @@ def idftmtx(N):
     return np.exp((2j * np.pi / N) * n.T * n)
 
 
+def get_dft(data):
+    """Get discrete fourier transform of data(numpy matrix/array)."""
+    if len(data.shape) == 1:
+        return (dftmtx(len(data)) * data[:, np.newaxis]).A1
+    M, N = data.shape
+    return np.asarray(dftmtx(M) * data * dftmtx(N))
+
+
+def get_idft(data):
+    """Get inverse discrete fourier transform of data(numpy matrix/array)."""
+    if len(data.shape) == 1:
+        return (idftmtx(len(data)) * data[:, np.newaxis] / len(data)).A1
+    M, N = data.shape
+    return np.asarray(idftmtx(M) * data * idftmtx(N) / (M * N))
+
+
 def pow2_ceil(x):
     """Get the nearest power of 2 ceiling."""
     return 2 ** int(np.ceil(np.log2(x)))
 
 
 def fft(x):
-    """Vectorized & iterative FFT.
-       Note: The input needs to be real."""
-    x = np.asarray(x, dtype=complex)
+    """Vectorized & iterative FFT."""
     N = len(x)
-
-    # cutoff
-    Nmin = min(N, 32)
-    subprob = np.asarray(dftmtx(Nmin) * x.reshape((Nmin, -1)))
+    cutoff = min(N, 16)
+    subprob = np.asarray(dftmtx(cutoff) * x.reshape((cutoff, -1)))
 
     # builds up the fft, from (1, N) to (N, 1)
-    while subprob.shape[0] < N:
+    while subprob.shape[1] != 1:
         m, n = subprob.shape
         # concatenate all `odd` part in sub problems
         # it will turn out to be subprob[:, n / 2:].
@@ -49,8 +61,9 @@ def fft(x):
         # so we can use each coff to multiply across the same row of `odd`
         # because the concatenation, m = 2N(N as in subproblem)
         # so -2j -> -1j
-        coff = np.exp(-1j * np.pi * np.arange(m) / m)[:, None]
-        subprob = np.vstack((even + coff * odd, even - coff * odd))
+        coff = np.exp((-1j * np.pi / m) * np.arange(m)[:, np.newaxis])
+        twiddle = coff * odd
+        subprob = np.vstack((even + twiddle, even - twiddle))
 
     return subprob.ravel()
 
@@ -58,22 +71,22 @@ def fft(x):
 def recursive_fft(x):
     """Recursive FFT."""
     N = len(x)
-    if (N <= 32):
-        return get_dft(x)
-    else:
+    if N > 16:
         even = recursive_fft(x[0::2])
         odd = recursive_fft(x[1::2])
-        coff = np.exp(-2j * np.pi * np.arange(N) / N)
-        return np.concatenate([even + coff[:N / 2] * odd,
-                               even + coff[N / 2:] * odd])
+        coff = np.exp((-2j * np.pi / N) * np.arange(N))
+        return np.hstack((even + coff[:N / 2] * odd,
+                          even + coff[N / 2:] * odd))
+    else:
+        return get_dft(x)
 
 
 def get_2d(data, fn):
     """Apply `fn` to each row, then to each column."""
     result = np.copy(data)
-    result = np.array([fn(row) for row in result])
-    result = np.array([fn(col) for col in result.T])
-    return result.T
+    result = np.apply_along_axis(fn, 0, result)
+    result = np.apply_along_axis(fn, 1, result)
+    return result
 
 
 def get_fft(data):
@@ -88,22 +101,6 @@ def get_ifft(data):
     Fstar = np.conj(data)
     fstar = get_fft(Fstar) / reduce(np.multiply, data.shape, 1.0)
     return np.conj(fstar)
-
-
-def get_dft(data):
-    """Get discrete fourier transform of data(numpy matrix/array)."""
-    if len(data.shape) == 1:
-        return (dftmtx(len(data)) * data[:, None]).A1
-    M, N = data.shape
-    return np.asarray(dftmtx(M) * data * dftmtx(N))
-
-
-def get_idft(data):
-    """Get inverse discrete fourier transform of data(numpy matrix/array)."""
-    if len(data.shape) == 1:
-        return (idftmtx(len(data)) * data[:, None] / len(data)).A1
-    M, N = data.shape
-    return np.asarray(idftmtx(M) * data * idftmtx(N) / (M * N))
 
 
 def scale_intensity(f, typef=np.uint8, L=256):
@@ -146,7 +143,7 @@ def pad_to_pow2(data):
     return padded
 
 
-def test_my_func(data, my_func, lib_func, all_right, name):
+def test_my_func(data, my_func, lib_func, name, all_right=np.allclose):
     """Check if my implementation is close to the one in the library."""
     my_result, lib_result = my_func(data), lib_func(data)
     error = np.abs(lib_result - my_result)
@@ -162,13 +159,14 @@ if __name__ == "__main__":
     lena = np.reshape(misc.lena(), (1024, 256))
     data = np.random.rand(1024)
 
-    test_my_func(lena, shift_dft, fftpack.fftshift, np.array_equal, 'Shift')
-    test_my_func(lena, get_dft, fftpack.fft2, np.allclose, '2D-DFT')
-    test_my_func(lena, get_idft, fftpack.ifft2, np.allclose, '2D-IDFT')
-    test_my_func(lena, get_fft, fftpack.fft2, np.allclose, '2D-FFT')
-    test_my_func(lena, get_ifft, fftpack.ifft2, np.allclose, '2D-IFFT')
+    test_my_func(lena, shift_dft, fftpack.fftshift, 'Shift', np.array_equal)
+    test_my_func(lena, get_dft, fftpack.fft2, '2D-DFT')
+    test_my_func(lena, get_idft, fftpack.ifft2, '2D-IDFT')
+    test_my_func(lena, get_fft, fftpack.fft2, '2D-FFT')
+    test_my_func(lena, get_ifft, fftpack.ifft2, '2D-IFFT')
 
-    test_my_func(data, get_dft, fftpack.fft, np.allclose, '1D-DFT')
-    test_my_func(data, get_idft, fftpack.ifft, np.allclose, '1D-IDFT')
-    test_my_func(data, get_fft, fftpack.fft, np.allclose, '1D-FFT')
-    test_my_func(data, get_ifft, fftpack.ifft, np.allclose, '1D-IFFT')
+    test_my_func(data, get_dft, fftpack.fft, '1D-DFT')
+    test_my_func(data, get_idft, fftpack.ifft, '1D-IDFT')
+    test_my_func(data, get_fft, fftpack.fft, '1D-FFT')
+    test_my_func(data, get_ifft, fftpack.ifft, '1D-IFFT')
+    test_my_func(data, recursive_fft, fftpack.fft, '1D-IFFT-Recursive')
