@@ -64,33 +64,31 @@ Since the borders of the original image are not black, padding the image with ze
 \textbf{Answer:}
 
 \begin{align*} 
-h(x, y) &
-= 2 f(x, y) - f(x+1, y) - f(x-1, y) \\
 g(x, y) &
-= 3 f(x, y) - f(x+1, y) - f(x-1, y)
+= 2 f(x, y) - f(x+1, y) - f(x-1, y)
 \end{align*}
 
 Using the translation property:
 
 \begin{align*} 
 G(u, v) & = \mathfrak{F}[g(x, y)] \\
-& = (3 - e^{\frac{2j\pi u}{M}} - e^{\frac{-2j\pi u}{M}})F(u, v)\\
+& = (2 - e^{\frac{2j\pi u}{M}} - e^{\frac{-2j\pi u}{M}})F(u, v)\\
 & = H(u, v) F(u, v) \\
-H(u, v) & = 3 - e^{\frac{2j\pi u}{M}} - e^{\frac{-2j\pi u}{M}} \\
-& = 3 - (\cos{\frac{2\pi u}{M}} + j\sin{\frac{2\pi u}{M}} + \cos{\frac{-2\pi u}{M}} + j\sin{\frac{-2\pi u}{M}}) \\
-& = 3 - (\cos{\frac{2\pi u}{M}} + j\sin{\frac{2\pi u}{M}} + \cos{\frac{2\pi u}{M}} - j\sin{\frac{2\pi u}{M}}) \\
-& = 3 - 2\cos{\frac{2\pi u}{M}} \\
+H(u, v) & = 2 - e^{\frac{2j\pi u}{M}} - e^{\frac{-2j\pi u}{M}} \\
+& = 2 - (\cos{\frac{2\pi u}{M}} + j\sin{\frac{2\pi u}{M}} + \cos{\frac{-2\pi u}{M}} + j\sin{\frac{-2\pi u}{M}}) \\
+& = 2 - (\cos{\frac{2\pi u}{M}} + j\sin{\frac{2\pi u}{M}} + \cos{\frac{2\pi u}{M}} - j\sin{\frac{2\pi u}{M}}) \\
+& = 2 - 2\cos{\frac{2\pi u}{M}} \\
 \end{align*}
 
 The centered form of $H(u, v)$ is
 
 $$
-3 - 2\cos{\frac{2\pi (u -\frac{M}{2})}{M}}
+2 - 2\cos{\frac{2\pi (u -\frac{M}{2})}{M}}
 $$
 
 As $u$ ranges from $0$ to $M − 1$, the value of
-$H(u, v)$ starts at $5$, falls to $1$ when $u = \frac{M}{2}$ (the center of
-the filter) and then climbs to $5$ again when $u = M$, as shown in Figure ~\ref{fig:Huv}. Therefore, the amplitude of the filter increases as a function of distance from the origin of the centered filter, which is the characteristic of a highpass filter.
+$H(u, v)$ starts at $4$, falls to $1$ when $u = \frac{M}{2}$ (the center of
+the filter) and then climbs to $4$ again when $u = M$, as shown in Figure ~\ref{fig:Huv}. Therefore, the amplitude of the filter increases as a function of distance from the origin of the centered filter, which is the characteristic of a highpass filter.
 
 \begin{figure}[H]
 	\centering
