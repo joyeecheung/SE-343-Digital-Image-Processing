@@ -20,17 +20,13 @@ def apply_filter(data, kernel):
     m, n = kernel.shape
     P, Q = pow2_ceil(m + M - 1), pow2_ceil(m + N - 1)
 
-    X, Y = np.meshgrid(np.arange(Q), np.arange(P))
-    sign = np.power(-1, X + Y)
-
     fp = np.zeros((P, Q))
     fp[:M, :N] = data
 
     hp = np.zeros((P, Q))
     hp[:m, :n] = kernel
 
-    Fuv = get_dft(fp)
-    Huv = get_dft(hp)
+    Fuv, Huv = get_dft(fp), get_dft(hp)
 
     return (get_idft(Fuv * Huv).real)[m / 2:M + m / 2, n / 2:N + n / 2]
 

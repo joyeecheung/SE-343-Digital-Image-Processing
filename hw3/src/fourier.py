@@ -39,10 +39,28 @@ def pow2_ceil(x):
     return 2 ** int(np.ceil(np.log2(x)))
 
 
-def fft(x):
-    """Vectorized & iterative FFT."""
+def recursive_fft(x):
+    """Recursive FFT."""
     N = len(x)
-    cutoff = min(N, 16)
+    if N > 16:
+        even = recursive_fft(x[0::2])
+        odd = recursive_fft(x[1::2])
+        coff = np.exp((-2j * np.pi / N) * np.arange(N / 2))
+        return np.hstack((even + coff * odd, even - coff * odd))
+    else:
+        return get_dft(x)
+
+
+def fft(x):
+    """Iterative & vectorized FFT.
+
+    Parameters
+    ---------
+    x: 1D numpy array
+        The vector to transform. Its length should be power of 2.
+    """
+    N = len(x)
+    cutoff = min(16, N)
     subprob = np.asarray(dftmtx(cutoff) * x.reshape((cutoff, -1)))
 
     # builds up the fft, from (1, N) to (N, 1)
@@ -68,32 +86,15 @@ def fft(x):
     return subprob.ravel()
 
 
-def recursive_fft(x):
-    """Recursive FFT."""
-    N = len(x)
-    if N > 16:
-        even = recursive_fft(x[0::2])
-        odd = recursive_fft(x[1::2])
-        coff = np.exp((-2j * np.pi / N) * np.arange(N))
-        return np.hstack((even + coff[:N / 2] * odd,
-                          even + coff[N / 2:] * odd))
-    else:
-        return get_dft(x)
-
-
 def get_2d(data, fn):
     """Apply `fn` to each row, then to each column."""
-    result = np.copy(data)
-    result = np.apply_along_axis(fn, 0, result)
-    result = np.apply_along_axis(fn, 1, result)
-    return result
+    result = np.apply_along_axis(fn, 0, data)
+    return np.apply_along_axis(fn, 1, result)
 
 
 def get_fft(data):
     """1D or 2D fft."""
-    if len(data.shape) == 1:
-        return fft(data)
-    return get_2d(data, fft)
+    return fft(data) if len(data.shape) == 1 else get_2d(data, fft)
 
 
 def get_ifft(data):
@@ -121,17 +122,11 @@ def shift_dft(f):
 
 
 def dft2d(input_img, flags):
-    if flags == 1:
-        return get_dft(input_img)
-    else:
-        return get_idft(input_img)
+    return get_dft(input_img) if flags == 1 else get_idft(input_img)
 
 
 def fft2d(input_img, flags):
-    if flags == 1:
-        return get_fft(input_img)
-    else:
-        return get_ifft(input_img)
+    return get_fft(input_img) if flags == 1 else get_ifft(input_img)
 
 
 def pad_to_pow2(data):
