@@ -77,7 +77,7 @@ def fft(x):
         odd, even = subprob[:, n / 2:], subprob[:, :n / 2]
         # since the input is real, the coefficients are symmetric
         # so we can use each coff to multiply across the same row of `odd`
-        # because the concatenation, m = 2N(N as in subproblem)
+        # because of the concatenation, m = 2N(N as in subproblem)
         # so -2j -> -1j
         coff = np.exp((-1j * np.pi / m) * np.arange(m)[:, np.newaxis])
         twiddle = coff * odd
