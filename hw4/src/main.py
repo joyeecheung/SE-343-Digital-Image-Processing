@@ -7,7 +7,7 @@ import os
 import numpy as np
 from PIL import Image
 
-from util import arithmetic_mean, harmonic_mean
+from util import arithmetic_mean, harmonic_mean, c_harmonic_mean
 
 
 def test_filter(filename, result_dir):
@@ -25,6 +25,14 @@ def test_filter(filename, result_dir):
     for size in h_mean_cases:
         result = harmonic_mean(im, size)
         result_name = 'harmonic-mean-%d-%d.png' % size
+        result_path = os.path.join(result_dir, result_name)
+        result.save(result_path)
+        print '[Saved] ' + result_path
+
+    c_h_mean_cases = [(3, 3), (9, 9)]
+    for size in c_h_mean_cases:
+        result = c_harmonic_mean(im, size, -1.5)
+        result_name = 'c-harmonic-mean-%d-%d.png' % size
         result_path = os.path.join(result_dir, result_name)
         result.save(result_path)
         print '[Saved] ' + result_path

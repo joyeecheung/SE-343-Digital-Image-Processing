@@ -81,10 +81,7 @@ def arithmetic_mean(img, size, raw=False):
     """Smooth the given image with arithmetic mean filter of given size."""
     m, n = size
     filter = np.full((m, n), float(1) / (m * n))  # averaging filter
-    if raw:
-        data = img
-    else:
-        data = np.array(img.getdata()).reshape(img.size[::-1])
+    data = np.array(img.getdata()).reshape(img.size[::-1]) if raw else img
 
     if raw:
         return filter2d(data, filter)
@@ -92,9 +89,22 @@ def arithmetic_mean(img, size, raw=False):
         return Image.fromarray(filter2d(data, filter)).convert(img.mode)
 
 
+def img_to_float(img):
+    return np.array(img.getdata(), dtype=np.float64).reshape(img.size[::-1])
+
+
 def harmonic_mean(img, size):
     """Smooth the given image with harmonic mean filter of given size."""
-    inverse = np.array(img.getdata(), dtype=np.float64).reshape(img.size[::-1])
-    inverse = np.reciprocal(inverse)
+    data = img_to_float(img)
+    inverse = np.reciprocal(data)
     result = np.reciprocal(arithmetic_mean(inverse, size, True))
+    return Image.fromarray(result).convert(img.mode)
+
+
+def c_harmonic_mean(img, size, Q):
+    data = img_to_float(img)
+    numerator = np.power(data, Q + 1)
+    denominator = np.power(data, Q)
+    filter = np.full(size, 1.0)
+    result = filter2d(numerator, filter) / filter2d(denominator, filter)
     return Image.fromarray(result).convert(img.mode)
