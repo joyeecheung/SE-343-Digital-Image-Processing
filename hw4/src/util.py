@@ -108,3 +108,30 @@ def c_harmonic_mean(img, size, Q):
     filter = np.full(size, 1.0)
     result = filter2d(numerator, filter) / filter2d(denominator, filter)
     return Image.fromarray(result).convert(img.mode)
+
+
+def stat_filter2d(input_img, size, perc):
+    """Apply a statistical filter to a 2-d image.
+
+    max: perc=100
+    min: perc=0
+    median: perc=50
+    """
+    M, N = input_img.shape  # M is height, N is width
+    m, n = size  # m is height, n is width
+    a, b = m / 2, n / 2
+    patches = view_as_window(input_img, (n, m))
+    pixels = patches.pixels
+
+    def correlation(x, y):
+        # z = np.zeros(n * m)  # pad with zeros
+        z = []
+        # fill in available neighborhood
+        for j in range(y - a, y + a + 1):
+            for i in range(x - b, x + b + 1):
+                if i > 0 and i < N and j > 0 and j < M:
+                    z.append(pixels[j][i])
+        return np.percentile(z, perc)
+
+    result = [correlation(x, y) for y in range(M) for x in range(N)]
+    return np.array(result).reshape(M, N)
