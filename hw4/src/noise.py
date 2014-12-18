@@ -62,10 +62,10 @@ def sap_noise(img, level=L, ps=None, pp=None):
         else:
             return z
 
-    if ps:
+    if ps and not pp:
         vf = np.vectorize(salt)
         return array_to_img(vf(data, ps), img.mode)
-    elif pp:
+    elif pp and not pp:
         vf = np.vectorize(pepper)
         return array_to_img(vf(data, pp), img.mode)
     elif ps and pp:

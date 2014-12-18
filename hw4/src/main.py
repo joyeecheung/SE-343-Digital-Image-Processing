@@ -210,7 +210,7 @@ def main():
     # 2.3.5
     test_sap(task_2_srcpath, sap_path)
 
-    # Task 2.4 Histogram Equalization on Color Images
+    # # Task 2.4 Histogram Equalization on Color Images
     test_hist(hist_srcpath, hist_path)
 
 if __name__ == "__main__":
