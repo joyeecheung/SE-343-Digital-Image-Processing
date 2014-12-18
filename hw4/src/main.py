@@ -7,14 +7,15 @@ import os
 import numpy as np
 from PIL import Image
 
-from filter import arithmetic_mean, harmonic_mean, contraharmonic_mean
-from filter import geometric_mean
+from filter import arithmetic_mean, geometric_mean
+from filter import harmonic_mean, contraharmonic_mean
 from filter import median_filter, max_filter, min_filter
-from noise import gauss_noise, sap_noise
+from noise import add_noise
 from hist import equalize_rgb_seperate, equalize_rgb_together
 
 
 def test_filter(filename, result_dir):
+    """2.2 Image Filtering"""
     im = Image.open(filename)
 
     def savewith(result, name):
@@ -22,16 +23,20 @@ def test_filter(filename, result_dir):
         result.save(result_path)
         print '[Saved] ' + result_path
 
+    # 1. filter with 3 x 3 and 9 x 9 arithmetic mean filters
     a_mean_cases = [(3, 3), (9, 9)]
     for size in a_mean_cases:
         result = arithmetic_mean(im, size)
         savewith(result, 'arithmetic-mean-%d-%d.png' % size)
 
+    # 2. filter  with 3 x 3 and 9 x 9 harmonic mean filters
     h_mean_cases = [(3, 3), (9, 9)]
     for size in h_mean_cases:
         result = harmonic_mean(im, size)
         savewith(result, 'harmonic-mean-%d-%d.png' % size)
 
+    # 2. filter  with 3 x 3 and 9 x 9 contraharmonic mean filters
+    #    with Q = −1.5.
     c_h_mean_cases = [(3, 3), (9, 9)]
     for size in c_h_mean_cases:
         result = contraharmonic_mean(im, size, -1.5)
@@ -39,6 +44,7 @@ def test_filter(filename, result_dir):
 
 
 def test_gauss(filename, result_dir):
+    """2.3.3 Guassian noise and denoising"""
     im = Image.open(filename)
 
     def savewith(result, name):
@@ -46,16 +52,16 @@ def test_gauss(filename, result_dir):
         result.save(result_path)
         print '[Saved] ' + result_path
 
-    # generate noise
+    # generate guassian noise
     mean, var = 0, 40
-    noisy = gauss_noise(im, mean, var)
+    noisy = add_noise(im, 'gauss', mean=mean, var=var)
     savewith(noisy, 'gauss-%d-%d.png' % (mean, var))
 
     # arithmetic mean filtering
     result = arithmetic_mean(noisy, (3, 3))
     savewith(result, 'gauss-arithmetic.png')
 
-    # TODO: geometric mean filtering
+    # geometric mean filtering
     result = geometric_mean(noisy, (3, 3))
     savewith(result, 'gauss-geometric.png')
 
@@ -73,6 +79,7 @@ def test_gauss(filename, result_dir):
 
 
 def test_salt(filename, result_dir):
+    """2.3.4 Salt noise and denoising"""
     im = Image.open(filename)
 
     def savewith(result, name):
@@ -80,18 +87,23 @@ def test_salt(filename, result_dir):
         result.save(result_path)
         print '[Saved] ' + result_path
 
-    ps, level = 0.2, 256
-    noisy = sap_noise(im, level, ps=ps)
+    # add salt noise with ps=0.2
+    ps = 0.2
+    noisy = add_noise(im, 'sap', ps=ps)
     savewith(noisy, 'salt-%d.png' % (int(100 * ps)))
 
+    # contraharmonic filtering
     q_neg, q_pos = 1.5, -1.5
+    # Q < 0
     result = contraharmonic_mean(noisy, (3, 3), q_neg)
     savewith(result, 'salt-contraharmonic-%s.png' % (str(q_neg)))
+    # Q > 0
     result = contraharmonic_mean(noisy, (3, 3), q_pos)
     savewith(result, 'salt-contraharmonic-%s.png' % (str(q_pos)))
 
 
 def test_sap(filename, result_dir):
+    """2.3.5 Salt-and-pepper noise and denoising"""
     im = Image.open(filename)
 
     def savewith(result, name):
@@ -99,9 +111,10 @@ def test_sap(filename, result_dir):
         result.save(result_path)
         print '[Saved] ' + result_path
 
-    psap, level = 0.2, 256
-    noisy = sap_noise(im, level, psap=psap)
-    savewith(noisy, 'sap-%d.png' % (int(100 * psap)))
+    # add salt-and-pepper noise with ps=pp=0.2
+    ps, pp = 0.2, 0.2
+    noisy = add_noise(im, 'sap', ps=ps, pp=pp)
+    savewith(noisy, 'sap-%d-%d.png' % (int(100 * ps), int(100 * pp)))
 
     # arithmetic mean filtering
     result = arithmetic_mean(noisy, (3, 3))
@@ -129,6 +142,7 @@ def test_sap(filename, result_dir):
 
 
 def test_hist(filename, result_dir):
+    """"2.4 Histogram Equalization on Color Images"""
     im = Image.open(filename)
 
     def savewith(result, name):
@@ -136,11 +150,16 @@ def test_hist(filename, result_dir):
         result.save(result_path)
         print '[Saved] ' + result_path
 
+    # 2.4.1 Do Histogram equalization on each channel separately,
+    #       then rebuild an RGB image
     result = equalize_rgb_seperate(im)
     savewith(result, 'hist-seperate.png')
 
+    # 2.4.2 Calculate the histogram for each channel, form an
+    #       average histogram, then rebuild an RGB image with it.
     result = equalize_rgb_together(im)
     savewith(result, 'hist-together.png')
+
 
 def main():
     # ------------ Ensure the project directory structure ---------
@@ -157,10 +176,12 @@ def main():
         print "Result directory does not exist, created."
         os.makedirs(result_dir)
 
+    # source image paths
     task_1_srcpath = os.path.join(source_path, 'task_1.png')
     task_2_srcpath = os.path.join(source_path, 'task_2.png')
     hist_srcpath = os.path.join(source_path, '02.png')
 
+    # result paths
     task_1_destpath = os.path.join(result_dir, 'task1')
     task_2_destpath = os.path.join(result_dir, 'task2')
     gauss_path = os.path.join(task_2_destpath, 'gauss')
@@ -168,6 +189,7 @@ def main():
     sap_path = os.path.join(task_2_destpath, 'sap')
     hist_path = os.path.join(result_dir, 'hist')
 
+    # make sure result paths exist
     destpaths = [task_1_destpath, task_2_destpath,
                  gauss_path, salt_path, sap_path, hist_path]
     for path in destpaths:
@@ -177,10 +199,18 @@ def main():
 
     # ------------ Generate results ---------
 
-    # test_filter(task_1_srcpath, task_1_destpath)
-    # test_gauss(task_2_srcpath, gauss_path)
-    # test_salt(task_2_srcpath, salt_path)
-    # test_sap(task_2_srcpath, sap_path)
+    # Task 2.2 Image Filtering
+    test_filter(task_1_srcpath, task_1_destpath)
+
+    # Task 2.3 Image Denoising
+    # 2.3.3
+    test_gauss(task_2_srcpath, gauss_path)
+    # 2.3.4
+    test_salt(task_2_srcpath, salt_path)
+    # 2.3.5
+    test_sap(task_2_srcpath, sap_path)
+
+    # Task 2.4 Histogram Equalization on Color Images
     test_hist(hist_srcpath, hist_path)
 
 if __name__ == "__main__":
