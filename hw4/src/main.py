@@ -7,8 +7,9 @@ import os
 import numpy as np
 from PIL import Image
 
-from util import arithmetic_mean, harmonic_mean, c_harmonic_mean
-from util import median_filter, max_filter, min_filter
+from filter import arithmetic_mean, harmonic_mean, contraharmonic_mean
+from filter import geometric_mean
+from filter import median_filter, max_filter, min_filter
 from noise import gauss_noise, sap_noise
 
 
@@ -32,8 +33,8 @@ def test_filter(filename, result_dir):
 
     c_h_mean_cases = [(3, 3), (9, 9)]
     for size in c_h_mean_cases:
-        result = c_harmonic_mean(im, size, -1.5)
-        savewith(result, 'c-harmonic-mean-%d-%d.png' % size)
+        result = contraharmonic_mean(im, size, -1.5)
+        savewith(result, 'contraharmonic-mean-%d-%d.png' % size)
 
 
 def test_gauss(filename, result_dir):
@@ -54,13 +55,15 @@ def test_gauss(filename, result_dir):
     savewith(result, 'gauss-arithmetic.png')
 
     # TODO: geometric mean filtering
+    result = geometric_mean(noisy, (3, 3))
+    savewith(result, 'gauss-geometric.png')
 
     # harmonic mean filtering
     result = harmonic_mean(noisy, (3, 3))
     savewith(result, 'gauss-harmonic.png')
 
     # contraharmonic mean filtering
-    result = c_harmonic_mean(noisy, (3, 3), -1.5)
+    result = contraharmonic_mean(noisy, (3, 3), -1.5)
     savewith(result, 'gauss-contraharmonic.png')
 
     # median filtering
@@ -81,9 +84,9 @@ def test_salt(filename, result_dir):
     savewith(noisy, 'salt-%d.png' % (int(100 * ps)))
 
     q_neg, q_pos = 1.5, -1.5
-    result = c_harmonic_mean(noisy, (3, 3), q_neg)
+    result = contraharmonic_mean(noisy, (3, 3), q_neg)
     savewith(result, 'salt-contraharmonic-%s.png' % (str(q_neg)))
-    result = c_harmonic_mean(noisy, (3, 3), q_pos)
+    result = contraharmonic_mean(noisy, (3, 3), q_pos)
     savewith(result, 'salt-contraharmonic-%s.png' % (str(q_pos)))
 
 
@@ -108,7 +111,7 @@ def test_sap(filename, result_dir):
     savewith(result, 'sap-harmonic.png')
 
     # contraharmonic mean filtering
-    result = c_harmonic_mean(noisy, (3, 3), -1.5)
+    result = contraharmonic_mean(noisy, (3, 3), 11.5)
     savewith(result, 'sap-contraharmonic.png')
 
     # max filtering
@@ -125,7 +128,7 @@ def test_sap(filename, result_dir):
 
 
 def main():
-    # ---------------- get the command line arguments --------------
+    # ------------ Ensure the project directory structure ---------
     file_dir = os.path.dirname(os.path.realpath(__file__))
     parent_dir, _ = os.path.split(file_dir)
     source_path = os.path.join(parent_dir, 'img')
@@ -139,13 +142,27 @@ def main():
         print "Result directory does not exist, created."
         os.makedirs(result_dir)
 
-    task_1_path = os.path.join(source_path, 'task_1.png')
-    task_2_path = os.path.join(source_path, 'task_2.png')
+    task_1_srcpath = os.path.join(source_path, 'task_1.png')
+    task_2_srcpath = os.path.join(source_path, 'task_2.png')
+    task_1_destpath = os.path.join(result_dir, 'task1')
+    task_2_destpath = os.path.join(result_dir, 'task2')
+    gauss_path = os.path.join(task_2_destpath, 'gauss')
+    salt_path = os.path.join(task_2_destpath, 'salt')
+    sap_path = os.path.join(task_2_destpath, 'sap')
 
-    #test_filter(task_1_path, result_dir)
-    #test_gauss(task_2_path, result_dir)
-    #test_salt(task_2_path, result_dir)
-    test_sap(task_2_path, result_dir)
+    destpaths = [task_1_destpath, task_2_destpath,
+                 gauss_path, salt_path, sap_path]
+    for path in destpaths:
+        if not os.path.exists(path):
+            print "Created", path
+            os.makedirs(path)
+
+    # ------------ Generate results ---------
+
+    test_filter(task_1_srcpath, task_1_destpath)
+    test_gauss(task_2_srcpath, gauss_path)
+    test_salt(task_2_srcpath, salt_path)
+    test_sap(task_2_srcpath, sap_path)
 
 if __name__ == "__main__":
     main()
