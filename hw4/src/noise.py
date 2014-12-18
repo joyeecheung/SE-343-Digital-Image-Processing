@@ -7,6 +7,8 @@ from PIL import Image
 from random import random
 from math import sin, cos, log, sqrt, pi
 
+from util import img_to_array, array_to_img
+
 
 class Gauss(object):
     def __init__(self, mu, sigma):
@@ -41,7 +43,7 @@ class Gauss(object):
 
 
 def sap_noise(img, level, ps=None, pp=None, psap=None):
-    data = np.array(img.getdata()).reshape(img.size[::-1])
+    data = img_to_array(img)
 
     def salt(z, ps):
         return level - 1 if random() < ps else z
@@ -60,23 +62,23 @@ def sap_noise(img, level, ps=None, pp=None, psap=None):
 
     if ps:
         vf = np.vectorize(salt)
-        return Image.fromarray(vf(data, ps)).convert(img.mode)
+        return array_to_img(vf(data, ps), img.mode)
     elif pp:
         vf = np.vectorize(pepper)
-        return Image.fromarray(vf(data, pp)).convert(img.mode)
+        return array_to_img(vf(data, pp), img.mode)
     elif psap:
         vf = np.vectorize(sap)
-        return Image.fromarray(vf(data, psap)).convert(img.mode)
+        return array_to_img(vf(data, psap), img.mode)
     else:
         raise Exception("No probability specified.")
 
 
 def gauss_noise(img, mean, var):
-    data = np.array(img.getdata()).reshape(img.size[::-1])
+    data = img_to_array(img)
     grand = Gauss(mean, var)
 
     def additive(z):
         return z + grand.next()
 
     vf = np.vectorize(additive)
-    return Image.fromarray(vf(data)).convert(img.mode)
+    return array_to_img(vf(data), img.mode)
