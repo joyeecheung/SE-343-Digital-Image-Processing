@@ -65,7 +65,9 @@ General expression
 
 \subsubsection{Arithmetic mean filter}
 
-The images filtered with $3 \times 3$ and $9 \times 9$ arithmetic mean filters are shown in Figure~\ref{fig:baram33} and~\ref{fig:baram99}
+The images filtered with $3 \times 3$ and $9 \times 9$ arithmetic mean filters are shown in Figure~\ref{fig:baram33} and~\ref{fig:baram99}.
+
+Both filters make the bars appear to be ``smaller'' in both height and width. Since the white sides of the edges will take the mean of their neighborhood as their new intensities, they will be grey instead of white after filtering, thus visually ``shrinking'' the bars. This effect also darkens the overall color of the image.
 
 \begin{figure}[H]
 	\captionsetup{justification=centering,margin=1cm}
@@ -88,7 +90,17 @@ The images filtered with $3 \times 3$ and $9 \times 9$ arithmetic mean filters a
 
 \subsubsection{Harmonic mean filter}
 
-The images filtered with $3 \times 3$ and $9 \times 9$ harmonic mean filters are shown in Figure~\ref{fig:barhm33} and~\ref{fig:barhm99}
+The images filtered with $3 \times 3$ and $9 \times 9$ harmonic mean filters are shown in Figure~\ref{fig:barhm33} and~\ref{fig:barhm99}.
+
+The expression of harmonic mean filtering is:
+
+$$
+\hat{f}(x, y) = \frac{mn}{\sum_{(s, t)\in S_{xy}} \frac{1}{g(s, t)}}
+$$
+
+Once there is any $g(s, t) = 0$, then $\sum_{(s, t)\in S_{xy}} \frac{1}{g(s, t)} = \infty$, then $\hat{f}(x, y) = 0$. Assuming $n$ is odd, $n = 2k + 1$ and $2k <$ the distance between the bars, an $n \times n$ harmonic mean filter will ``blacken'' $k$ pixels of the edges of the bars in every direction. Therefore with a $3 \times 3$ harmonic filter, the bars are $2 \times 1 = 2$ pixels thiner, $2 \times 1 = 2$ pixels shorter. When the neighborhood is $9 \times 9$, the bars are $4 \times 1 = 4$ pixels thiner, $4 \times 1 = 4$ pixels shorter, which effectively makes the bars disappear.
+
+
 \begin{figure}[H]
 	\captionsetup{justification=centering,margin=1cm}
 	\begin{minipage}[b]{0.48\linewidth}
@@ -111,20 +123,28 @@ The images filtered with $3 \times 3$ and $9 \times 9$ harmonic mean filters are
 
 The images filtered with $3 \times 3$ and $9 \times 9$ contraharmonic mean filters are shown in Figure~\ref{fig:barchm33} and~\ref{fig:barchm99}
 
+The expression of contraharmonic mean filtering is:
+
+$$
+\hat{f}(x, y) = \frac{\sum_{(s, t)\in S_{xy}} g(s, t)^{Q+1}}{\sum_{(s, t)\in S_{xy}} g(s, t)^Q}
+$$
+
+When $Q < 0$, once there is any $g(s, t) = 0$, then $\sum_{(s, t)\in S_{xy}} g(s, t)^{Q} = 0$, then $\hat{f}(x, y) = 0$. When $Q = -1.5$, using the same reasoning as for the harmonic mean filter, a $3 \times 3$ contraharmonic filter will make the bars $2 \times 1 = 2$ pixels thiner, $2 \times 1 = 2$ pixels shorter. A $9 \times 9$ contraharmonic filter will make the bars $4 \times 1 = 4$ pixels thiner, $4 \times 1 = 4$ pixels shorter, effectively making the bars disappear.
+
 \begin{figure}[H]
-	\captionsetup{justification=centering,margin=1cm}
+	\captionsetup{justification=centering,margin=0.5cm}
 	\begin{minipage}[b]{0.48\linewidth}
 		\centering
 		% pt = px * 72 / DPI
 		\includegraphics[width=192pt]{../result/task1/contraharmonic-mean-3-3.png}
-		\caption{Filtered with $3 \times 3$ contraharmonic mean filter}
+		\caption{Filtered with $3 \times 3$ contraharmonic mean filter($Q=-1.5$)}
 		\label{fig:barchm33}
 	\end{minipage}
 	\begin{minipage}[b]{0.48\linewidth}
 		\centering
 		% pt = px * 72 / DPI
 		\includegraphics[width=192pt]{../result/task1/contraharmonic-mean-9-9.png}
-		\caption{Filtered with $9 \times 9$ contraharmonic mean filter}
+		\caption{Filtered with $9 \times 9$ contraharmonic mean filter($Q=-1.5$)}
 		\label{fig:barchm99}
 	\end{minipage}
 \end{figure}
