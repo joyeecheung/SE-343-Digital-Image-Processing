@@ -94,12 +94,15 @@ def test_salt(filename, result_dir):
 
     # contraharmonic filtering
     q_neg, q_pos = 1.5, -1.5
+    q_neg_name, q_pos_name = map(
+        lambda x: str(x).replace('.', '-'), (q_neg, q_pos))
+
     # Q < 0
     result = contraharmonic_mean(noisy, (3, 3), q_neg)
-    savewith(result, 'salt-contraharmonic-%s.png' % (str(q_neg)))
+    savewith(result, 'salt-contraharmonic-%s.png' % q_neg_name)
     # Q > 0
     result = contraharmonic_mean(noisy, (3, 3), q_pos)
-    savewith(result, 'salt-contraharmonic-%s.png' % (str(q_pos)))
+    savewith(result, 'salt-contraharmonic-%s.png' % q_pos_name)
 
 
 def test_sap(filename, result_dir):
@@ -125,7 +128,7 @@ def test_sap(filename, result_dir):
     savewith(result, 'sap-harmonic.png')
 
     # contraharmonic mean filtering
-    result = contraharmonic_mean(noisy, (3, 3), 11.5)
+    result = contraharmonic_mean(noisy, (3, 3), 0.5)
     savewith(result, 'sap-contraharmonic.png')
 
     # max filtering
@@ -210,7 +213,7 @@ def main():
     # 2.3.5
     test_sap(task_2_srcpath, sap_path)
 
-    # # Task 2.4 Histogram Equalization on Color Images
+    # Task 2.4 Histogram Equalization on Color Images
     test_hist(hist_srcpath, hist_path)
 
 if __name__ == "__main__":
