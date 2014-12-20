@@ -4,6 +4,7 @@
 import numpy as np
 
 from util import img_to_array, array_to_img
+from math import floor, ceil
 
 
 def filter2d(input_img, filter):
@@ -84,11 +85,18 @@ def stat_filter2d(input_img, size, perc):
             for j in xrange(y - b, y + b + 1):
                 if i >= 0 and i < M and j >= 0 and j < N:
                     z.append(input_img[i, j])
-        return np.percentile(z, perc)
+        return percentile(z, perc)
 
     xx, yy = np.meshgrid(xrange(M), xrange(N), indexing='ij')
     vf = np.vectorize(get_percentile)
     return vf(xx, yy)
+
+
+def percentile(arr, p):
+    idx = p / 100.0 * (len(arr) - 1)
+    sorted_arr = sorted(arr)
+    below, above = int(floor(idx)), int(ceil(idx))
+    return (sorted_arr[below] + sorted_arr[above]) / 2.0
 
 
 def median_filter(img, size):
@@ -118,7 +126,6 @@ def geometric_mean(input_img, size):
     M, N = data.shape  # M is height, N is width
     m, n = size  # m is height, n is width
     a, b = m / 2, n / 2
-
     def get_gmean(x, y):
         z = np.full(n * m, data[x, y])  # pad with border duplicates
         # fill in available neighborhood
