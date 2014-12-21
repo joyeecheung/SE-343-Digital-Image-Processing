@@ -253,7 +253,7 @@ As explained in the analysis of filtered bar images, the harmonic mean filter (F
 The median filter (Figure~\ref{fig:gaussm}) does the best job at denoising the image since it's very suitable for random noise like this. It also has considerably less
 blurring than the others.
 
-\subsubsection[H]{Salt noise and denoising}
+\subsubsection{Salt noise and denoising}
 
 
 \begin{figure}[H]
@@ -352,7 +352,7 @@ When salt noise is added to the image, the noise value is relatively large. Cons
 
 \paragraph{Discussion}
 
-When there are both salt noise with $p = 0.2$ and pepper noise with $p = 0.2$ in the image, for a $3 \times 3$ neighborhood, the expected number of pixels with $intensity = 0$ is $9 \times 0.2 = 1.8$, same as the expected number of pixels with $intensity = L - 1$. Therefore in a $3 \times 3$ neighborhood there are likely $1 ~ 2$ pixels with the minimum intensity and $1 ~ 2 pixels$ with the minimun intensity.
+When there are both salt noise with $p = 0.2$ and pepper noise with $p = 0.2$ in the image, for a $3 \times 3$ neighborhood, the expected number of pixels with $intensity = 0$ is $9 \times 0.2 = 1.8$, same as the expected number of pixels with $intensity = L - 1$. Therefore in a $3 \times 3$ neighborhood there are likely $1 \sim 2$ pixels with the minimum intensity and $1 \sim 2$ pixels with the minimun intensity.
 
 The arithmetic mean filter reduces some noises (as shown in Figure~\ref{fig:sapam}), making the objects in the image more recognizable, but there are still a considerable amount of noises in the result. Because of the indensity (approximately $40\%$) and the extreme values of the noises, it is hard for an arithmetic mean filter to produce a satisfying result.
 
@@ -380,14 +380,21 @@ Although the median filter successfully restores most of the image, because of t
 	% pt = px * 72 / DPI
 	\includegraphics[width=288pt]{../result/hist/hist-seperate.png}
 	\caption{Image rebuilt with three channels equalized with different histograms}
+	\label{fig:sep}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=288pt]{../result/hist/hist-together.png}
 	\caption{Image rebuilt with three channels equalized with the same average histogram}
+	\label{fig:tog}
 \end{figure}
 
+\subsubsection{Discussion}
+
+Because histogram equalization is not a linear process, building the equalized image with three seperatly equalized channels would introduce erroneous colors in the result. For a given pixel, each color component will be altered in different magnitude, resulting in a hue deviating from the original one.  As shown in Figure~\ref{fig:sep}, the result built with the seperately equalized channels is improved in contrast, but weirdly covered with a blue-ish color.
+
+When the three channels share one histogram as the basis for histogram equalization, components of each pixel will be altered in similar magnitudes, therefore the color in the result will not be too far away from the original image, as shown in Figure~\ref{fig:tog}.
 
 \end{document}
