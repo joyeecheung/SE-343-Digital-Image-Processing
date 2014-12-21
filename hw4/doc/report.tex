@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[a4paper,top=0.75in, bottom=0.75in, left=1in, right=1in,footskip=0.2in]{geometry}
+\usepackage[a4paper,top=0.6in, bottom=0.5in, left=1in, right=1in,footskip=0.1in]{geometry}
 %\usepackage{fullpage}
 \usepackage{listings}
 \usepackage{gensymb}
@@ -157,7 +157,35 @@ When $Q < 0$, once there is any $g(s, t) = 0$, then $\sum_{(s, t)\in S_{xy}} g(s
 \subsubsection{Statistical filters}
 
 \paragraph{Algorithm}
-Discuss how you implement this operation in less than 1 page.
+\begin{algorithm}
+\centering
+\caption{Statistical filters}
+\label{alg:statfilt}
+  \begin{algorithmic}[1]
+    \Function{stat\_filter}{$input\_img$, $size$, $p$}
+        \Comment{$input\_img$ is the input image}
+        \State $output\_img = $ a new image \Comment{$size$ is the size of the neighborhood} 
+	    \For{each pixel $(x, y)$ in $input\_img$} \Comment{$p$ is the percentile}
+    		\State Get the neighborhood of $(x, y)$
+    		\State Get the $p_{th}$ percentile in the neighborhood
+    		\State Put the $p_{th}$ percentile to the pixel $(x, y)$ in $output\_image$
+	    \EndFor
+      \State \Return $output\_image$
+    \EndFunction
+\\
+    \Function{max\_filter}{$input\_img$, $size$}
+    	\State \Return \Call{stat\_filter}{$input\_img$, $size$, $100$}
+    \EndFunction
+\\
+    \Function{min\_filter}{$input\_img$, $size$}
+    	\State \Return \Call{stat\_filter}{$input\_img$, $size$, $0$}
+    \EndFunction
+\\
+    \Function{median\_filter}{$input\_img$, $size$}
+    	\State \Return \Call{stat\_filter}{$input\_img$, $size$, $50$}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 
 \begin{figure}[]
 	\centering
@@ -168,8 +196,7 @@ Discuss how you implement this operation in less than 1 page.
 
 \subsubsection{Gaussian noise and denoising}
 
-\paragraph{Results}
-\begin{figure}[H]
+\begin{figure}[]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=336pt]{../result/task2/gauss/gauss-0-40.png}
@@ -177,7 +204,7 @@ Discuss how you implement this operation in less than 1 page.
 	\label{fig:gauss}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=336pt]{../result/task2/gauss/gauss-arithmetic.png}
@@ -185,7 +212,7 @@ Discuss how you implement this operation in less than 1 page.
 	\label{fig:gaussam}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=336pt]{../result/task2/gauss/gauss-geometric.png}
@@ -193,7 +220,7 @@ Discuss how you implement this operation in less than 1 page.
 	\label{fig:gaussgm}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=336pt]{../result/task2/gauss/gauss-harmonic.png}
@@ -201,7 +228,7 @@ Discuss how you implement this operation in less than 1 page.
 	\label{fig:gausshm}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=336pt]{../result/task2/gauss/gauss-contraharmonic.png}
@@ -209,7 +236,7 @@ Discuss how you implement this operation in less than 1 page.
 	\label{fig:gausschm}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[]
 	\centering
 	% pt = px * 72 / DPI
 	\includegraphics[width=336pt]{../result/task2/gauss/gauss-median.png}
@@ -219,11 +246,15 @@ Discuss how you implement this operation in less than 1 page.
 
 
 \paragraph{Discussion}
-Compare these results, and discuss which one looks better / worse, and why, within 1 page
+Both arithmetic mean filtering (Figure~\ref{fig:gaussam}) and geometric mean filtering (Figure~\ref{fig:gaussgm}) successully reduce the noise in the image. Since the geometric mean is more suitable for drastically different terms by nature, the geometric mean filter can better preserve the edges in the image. Therefore it does not blur the image as much as the arithmetic mean filter. Nonetheless, since any pixel in the neighborhood with intensity $0$ would make the geometric mean $0$, there are some unpleasent black flakes scattered in the image denoised with geometric mean filter.
+
+As explained in the analysis of filtered bar images, the harmonic mean filter (Figure~\ref{fig:gausshm}) and the contraharmonic filter (Figure~\ref{fig:gausschm}) have the same problem as the geometric mean filter -- unpleasent black flakes. They both reduces some noise, but not as good as the arithmetic mean filter and the geometric mean filter.
+
+The median filter (Figure~\ref{fig:gaussm}) does the best job at denoising the image since it's very suitable for random noise like this. It also has considerably less
+blurring than the others.
 
 \subsubsection[H]{Salt noise and denoising}
 
-\paragraph{Results}
 
 \begin{figure}[H]
 	\centering
@@ -250,7 +281,13 @@ Compare these results, and discuss which one looks better / worse, and why, with
 \end{figure}
 
 \paragraph{Discussion}
-Discuss why setting a wrong value for Q would lead to terrible results within 1 page.
+The expression of contraharmonic mean filtering is:
+
+$$
+\hat{f}(x, y) = \frac{\sum_{(s, t)\in S_{xy}} g(s, t)^{Q+1}}{\sum_{(s, t)\in S_{xy}} g(s, t)^Q}
+$$
+
+When salt noise is added to the image, the noise value is relatively large. Consider a $3 \times 3$ neighborhood with the noise $intensity = 255$ as its center and others $intensity = 0$. when $Q < 0$, the small numbers in the neighborhood will dominate the result. The numerator can then be thought of as a constant raised to $Q + 1$ and the denominator as a the same constant raised to $Q$. This constant is then the value of the pixels in the neighborhood. So the ratio is just that value. Therefore, a $Q < 0$ can effectively reduce the salt noise in the image. But when $Q > 0$, the large center will dominate the contraharmonic mean, and affect the pixels around it. In this case, other pixels will be incorrectly lightened, making the image look worse.
 
 \subsubsection{Salt-and-pepper noise and denoising}
 \paragraph{Results}
@@ -314,7 +351,18 @@ Discuss why setting a wrong value for Q would lead to terrible results within 1 
 \end{figure}
 
 \paragraph{Discussion}
-Compare these results, and discuss which one looks better / worse, and why, within 1 page
+
+When there are both salt noise with $p = 0.2$ and pepper noise with $p = 0.2$ in the image, for a $3 \times 3$ neighborhood, the expected number of pixels with $intensity = 0$ is $9 \times 0.2 = 1.8$, same as the expected number of pixels with $intensity = L - 1$. Therefore in a $3 \times 3$ neighborhood there are likely $1 ~ 2$ pixels with the minimum intensity and $1 ~ 2 pixels$ with the minimun intensity.
+
+The arithmetic mean filter reduces some noises (as shown in Figure~\ref{fig:sapam}), making the objects in the image more recognizable, but there are still a considerable amount of noises in the result. Because of the indensity (approximately $40\%$) and the extreme values of the noises, it is hard for an arithmetic mean filter to produce a satisfying result.
+
+As explained in previous sections, once there is any pixels with $intensity = 0$ in the neighborhood, the output of a harmonic mean filter will be $0$ too. Since we expect more than $1$ pixel with $intensity = 0$ in any $3 \times 3$ neighborhood, most pixels of the filtered image will be turned black, leading to terrible results, as shown in Figure~\ref{fig:saphm}.
+
+Since a contraharmonic mean filter can only handle salt noise \textbf{or} pepper noise but not both at the same time, in this case, it makes the result look worse, as shown in Figure~\ref{fig:sapchm}.
+
+Because we expect more than $1$ pixel with the minimun intensity and more than $1$ pixel with the maximun intensity in any $3 \times 3$ neighborhood, most pixels in the result of a max filter will have the maximun intensity and a minimun filter minimun intensity. Both results are disastrous, as shown in Figure~\ref{fig:sapmax} and~\ref{fig:sapmin}.
+
+Although the median filter successfully restores most of the image, because of the high indensity of the noise, there are still some visible noises in the result, as shown in Figure~\ref{fig:sapmedian}.
 
 \subsection{Histogram Equalization on Color Images}
 
