@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Spatial filters."""
 
 import numpy as np
 
@@ -14,7 +15,7 @@ def filter2d(input_img, filter):
     a, b = m / 2, n / 2  # size of neighborhood
 
     # get transpose of the 1-d filter
-    if (isinstance(filter, np.ndarray)):
+    if isinstance(filter, np.ndarray):
         wt = filter.ravel()
     else:
         wt = np.array(filter).ravel()
@@ -38,13 +39,13 @@ def filter2d(input_img, filter):
 def arithmetic_mean(img, size, raw=False):
     """Smooth the given image with arithmetic mean filter of given size."""
     m, n = size
-    filter = np.full((m, n), float(1) / (m * n))  # denominator
+    kernel = np.full((m, n), float(1) / (m * n))  # denominator
     data = img if raw else img_to_array(img)
 
     if raw:
-        return filter2d(data, filter)
+        return filter2d(data, kernel)
     else:
-        return array_to_img(filter2d(data, filter), img.mode)
+        return array_to_img(filter2d(data, kernel), img.mode)
 
 
 def harmonic_mean(img, size):
@@ -61,8 +62,8 @@ def contraharmonic_mean(img, size, Q):
     data = img_to_array(img, dtype=np.float64)
     numerator = np.power(data, Q + 1)
     denominator = np.power(data, Q)
-    filter = np.full(size, 1.0)
-    result = filter2d(numerator, filter) / filter2d(denominator, filter)
+    kernel = np.full(size, 1.0)
+    result = filter2d(numerator, kernel) / filter2d(denominator, kernel)
     return array_to_img(result, img.mode)
 
 
@@ -126,6 +127,7 @@ def geometric_mean(input_img, size):
     M, N = data.shape  # M is height, N is width
     m, n = size  # m is height, n is width
     a, b = m / 2, n / 2
+
     def get_gmean(x, y):
         z = np.full(n * m, data[x, y])  # pad with border duplicates
         # fill in available neighborhood

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Noise generators."""
+
 import numpy as np
-from PIL import Image
 
 from random import random
 from math import sin, cos, log, sqrt, pi

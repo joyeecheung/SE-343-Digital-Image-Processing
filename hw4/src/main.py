@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse
 import os
 
-import numpy as np
 from PIL import Image
 
 from filter import arithmetic_mean, geometric_mean
@@ -94,8 +92,8 @@ def test_salt(filename, result_dir):
 
     # contraharmonic filtering
     q_neg, q_pos = 1.5, -1.5
-    q_neg_name, q_pos_name = map(
-        lambda x: str(x).replace('.', '-'), (q_neg, q_pos))
+    q_neg_name, q_pos_name = [str(q).replace('.', '-')
+                              for q in (q_neg, q_pos)]
 
     # Q < 0
     result = contraharmonic_mean(noisy, (3, 3), q_neg)

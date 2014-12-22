@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Histogram related functions."""
 
 from itertools import takewhile
 from collections import Counter
@@ -23,10 +24,10 @@ def equalize(data, total, level=256):
        with `total` number of pixels and the given intensity `level`."""
     INTENSITY, COUNT, PDF = 0, 1, 1
     data = sorted(data, key=lambda x: x[INTENSITY])
-    pdf = map(lambda x: (x[INTENSITY], float(x[COUNT])/total), data)
-    cdf = [sum(map(lambda x: x[PDF],
-                   takewhile(lambda x: x[INTENSITY] <= i,
-                             pdf))) for i in range(level)]
+    pdf = [(x[INTENSITY], float(x[COUNT]) / total) for x in data]
+    cdf = [sum(x[PDF] for x in
+               takewhile(lambda x: x[INTENSITY] <= i, pdf))
+           for i in range(level)]
     lookup = [round((level - 1) * i) for i in cdf]
     return lookup
 
@@ -51,9 +52,9 @@ def equalize_rgb_together(input_img):
     """Calculate the histogram for each channel, form an
        average histogram, then rebuild an RGB image with it."""
     channels = input_img.split()
-    data = map(lambda ch: list(ch.getdata()), channels)
+    data = (list(ch.getdata()) for ch in channels)
     average_hist = [(k, v / 3) for k, v in Counter(sum(data, [])).items()]
     pixel_count = input_img.size[0] * input_img.size[1]
     lookup = equalize(average_hist, pixel_count)
-    equalized = map(lambda ch: Image.eval(ch, lambda x: lookup[x]), channels)
+    equalized = [Image.eval(ch, lambda x: lookup[x]) for ch in channels]
     return Image.merge('RGB', equalized)
