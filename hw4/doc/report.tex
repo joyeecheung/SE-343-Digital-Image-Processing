@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[a4paper,top=0.6in, bottom=0.5in, left=1in, right=1in,footskip=0.1in]{geometry}
+\usepackage[a4paper,top=0.6in, bottom=0.6in, left=1in, right=1in,footskip=0.3in]{geometry}
 %\usepackage{fullpage}
 \usepackage{listings}
 \usepackage{gensymb}
@@ -16,6 +16,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{tikz}
+\usetikzlibrary{arrows,calc}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
@@ -36,19 +37,133 @@
 \begin{enumerate}
 \item Advantages of HSI color space:
 \begin{enumerate}
-\item xxx
-\item xxx
+\item More intuitive and natural for human interpretation. Fore example, it is hard to tell what color RGB$(245, 131, 129)$ is by just looking at these values, but when using its HSI counterpart HSI$(1\degree, 85, 73)$ it is easy to see that this is a color with hue close to pure red, moderate saturation and intensity -- a pink-ish color.
+\item When used with spatial filtering, sometimes we can apply the filter to only one channel in the HSI color space to acheive what can not be done in other color spaces: for example, to smooth out the intensity transition of the image.
+
 \end{enumerate}
 
-\item Adding $120\degree$ to the Hue components
+\item \begin{enumerate}
+\item If $0\degree \leq H < 120\degree $, after adding $120\degree$ to $H$, the color will be in the GB sector which will cancel out the added $120\degree$, so we can use H directly in the equations:
+
+\begin{align*}
+R &= I(1 - S) \\
+G &= I[1+\frac{ScosH}{cos(60\degree-H)}] \\
+B &= 3I - (R +　G)
+\end{align*}
+
+\item If $120\degree \leq H < 240\degree $, after adding $120\degree$ to $H$, the color will be in the BR sector which will need to subtract $H + 120\degree$ by $240\degree$, then with $H - 120\degree$ we have:
+
+\begin{align*}
+G &= I(1 - S) \\
+B &= I[1+\frac{ScosH}{cos(60\degree-(H - 120\degree)}] \\
+R &= 3I - (G +　B)
+\end{align*}
+
+\item If $240\degree \leq H < 360\degree $, after adding $120\degree$ to $H$, the color will be wrapped into the RG sector, we can consider its new Hue as $H - 240\degree$, then:
+
+\begin{align*}
+B &= I(1 - S) \\
+R &= I[1+\frac{ScosH}{cos(60\degree-(H - 240\degree)}] \\
+G &= 3I - (R +　B)
+\end{align*}
+
+\item If $H=360\degree$, then $H+120\degree$ can be considered as $120\degree$, the color is in the GB sector, $H - 120\degree = 0\degree$:
+
+\begin{align*}
+R &= I(1 - S) \\
+G &= I[1+\frac{Scos0\degree}{cos60\degree}]\\
+&=I[1+\frac{S}{\sqrt{3}/2}]\\
+B &= 3I - (R +　G)
+\end{align*}
+
+\end{enumerate}
 \end{enumerate}
 
 \subsection{Color Composition}
 
 \textbf{Answer:}
 
-General expression
+\begin{figure}[b]
+\centering
+\begin{tikzpicture}[
+	%Define style for different line styles
+	help lines/.style={dashed},
+	axis/.style={<->},
+	extended line/.style={dashed,shorten >=-#1},
+	extended line/.default=1.2cm
+]
+	% Axis
+	\coordinate (y) at (0,6);
+	\coordinate (x) at (6,0);
+	\draw[axis] (y) node[above] {$y$} -- (0,0) --  (x) node[right] {$x$};
 
+	%coordinates
+	\coordinate (c1) at (3.5,5);
+	\coordinate (c2) at (1.5,3.5);
+	\coordinate (c3) at (1,1);
+	\coordinate (c4) at (5,2);
+	\coordinate (c) at (3.2,4);
+    \coordinate (c0) at  (intersection cs:
+       first line={(c2)--(c4)},
+       second line={(c1) -- ($(c1)!-1cm!(c)$)});
+
+	% points
+	\fill (c1) circle [radius=1pt] node[above] {$c_1$};
+	\fill (c2) circle [radius=1pt] node[left] {$c_2$};
+	\fill (c3) circle [radius=1pt] node[below] {$c_3$};
+	\fill (c4) circle [radius=1pt] node[right] {$c_4$};
+	\fill (c) circle [radius=1pt] node[right] {$c$};
+	\fill (c0) circle [radius=1pt] node[below] {$c_0$};
+
+	%quadrilateral
+	\draw (c1) -- (c2) -- (c3) -- (c4) -- (c1);
+
+	% lines
+	\draw[help lines](c2) -- (c4);
+	\draw[help lines](c2) -- (c4);
+	\draw[extended line](c1) -- (c);
+\end{tikzpicture}
+\caption{Quadrilateral formed by $c_1, c_2, c_3, c_4$}
+\end{figure}
+In the quadrilateral formed by $c_1, c_2, c_3, c_4$, connect $c_2c_4$. Suppose $c$ falls in the triangle formed by $c_1c_2c_4$, extend $c_1$ until it intersect with $c_2c_4$ at point $c_0(x_0, y_0)$, then $x_0$ and $y_0$ is given by the equations
+
+\begin{align*} 
+y_0 - y_4 &= \frac{y_2-y_4}{x_2-x_4}(x_0-x_4)\\
+y_0-y_1 &= \frac{y-y_1}{x-x_1}(x_0-x_1)
+\end{align*}
+
+Define the distance between $c_a(x_a, y_a)$ and $c_b(x_b, y_b)$ as
+
+$$
+d(c_a, c_b) = \sqrt{(x_a-x_b)^2+(y_a-y_b)^2}
+$$
+
+Suppose the percentages of $c_2$ and $c_4$ contained in $c_0$ are $p_{2,0}\%$ and $p_{4,0}\%$, then
+
+\begin{align*}
+p_{2, 0} &= \frac{d(c_2, c_4) - d(c_2, c_0)}{d(c_2, c_4)} \times 100\\
+&=  \frac{d(c_4, c_0)}{d(c_2, c_4)} \times 100
+\end{align*}
+\begin{align*}
+p_{4, 0} &= \frac{d(c_2, c_4) - d(c_4, c_0)}{d(c_2, c_4)} \times 100 \\
+&=  \frac{d(c_2, c_0)}{d(c_2, c_4)} \times 100
+\end{align*}
+
+Assume the percentages of $c_1$, $c_2$ and $c_4$ in $c$ are $p_1\%$, $p_2\%$ and $p_4\%$, then
+
+\begin{align*}
+p_1 + p_2 + p_4 &= 100
+\end{align*}
+\begin{align*}
+p_1 &= \frac{d(c_1, c) - d(c_1, c_0)}{d(c_1, c_0)} \times 100\\
+&=  \frac{d(c_0, c)}{d(c_1, c_0)} \times 100
+\end{align*}
+\begin{align*}
+\frac{p_2}{p_4} & = \frac{p_{2, 0}}{p_{4, 0}}\\
+&=  \frac{d(c_4, c_0)}{d(c_2, c_0)}
+\end{align*}
+
+Solve the equations above, then we have $p_1$, $p_2$ and $p_4$ (the detailed form of the expressions is omitted here since it is too complicated). Because $c$ can be defined by these three colors, we can simply say $p_3 = 0 \%$ (note that if $c$ falls in the triangle $c_2c_3c_4$, we need to swap $c_1$ and $c_3$ in the process above).
 
 % -------------------- Programming Tasks ------------------------
 \section{Programming Tasks}
@@ -248,7 +363,7 @@ When $Q < 0$, once there is any $g(s, t) = 0$, then $\sum_{(s, t)\in S_{xy}} g(s
 \paragraph{Discussion}
 Both arithmetic mean filtering (Figure~\ref{fig:gaussam}) and geometric mean filtering (Figure~\ref{fig:gaussgm}) successully reduce the noise in the image. Since the geometric mean is more suitable for drastically different terms by nature, the geometric mean filter can better preserve the edges in the image. Therefore it does not blur the image as much as the arithmetic mean filter. Nonetheless, since any pixel in the neighborhood with intensity $0$ would make the geometric mean $0$, there are some unpleasent black flakes scattered in the image denoised with geometric mean filter.
 
-As explained in the analysis of filtered bar images, the harmonic mean filter (Figure~\ref{fig:gausshm}) and the contraharmonic filter (Figure~\ref{fig:gausschm}) have the same problem as the geometric mean filter -- unpleasent black flakes. They both reduces some noise, but not as good as the arithmetic mean filter and the geometric mean filter.
+As explained in the analysis of filtered bar images, the harmonic mean filter (Figure~\ref{fig:gausshm}) and the contraharmonic filter (Figure~\ref{fig:gausschm}) have the same problem as the geometric mean filter -- unpleasent black flakes (since here I use $3 \times 3$ filters, the flakes are also sized $3 \times 3$). They both reduces some noise, but not as good as the arithmetic mean filter and the geometric mean filter.
 
 The median filter (Figure~\ref{fig:gaussm}) does the best job at denoising the image since it's very suitable for random noise like this. It also has considerably less
 blurring than the others.

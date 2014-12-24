@@ -37,11 +37,12 @@ class Gauss(object):
 
         z = self.gauss_next
         self.gauss_next = None
+
         if z is None:
-            a = random() * 2 * pi
-            b = sqrt(-2.0 * log(1.0 - random()))
-            z = cos(a) * b
-            self.gauss_next = sin(a) * b
+            theta = random() * 2 * pi
+            r = sqrt(-2.0 * log(1.0 - random()))
+            z = r * cos(theta)
+            self.gauss_next = r * sin(theta)
 
         return self.mu + z * self.sigma
 
